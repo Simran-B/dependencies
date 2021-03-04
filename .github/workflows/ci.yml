@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
+
+      - name: Build OpenColorIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}/build
+        run: ./opencolorio.sh
