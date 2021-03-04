@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  INSTALL_DIR: ${{ runner.workspace }}/install
+  INSTALL_DIR: $GITHUB_WORKSPACE/install
   DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
 
 jobs:
