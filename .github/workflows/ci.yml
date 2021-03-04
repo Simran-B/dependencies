@@ -6,7 +6,6 @@ on:
       - master
 
 env:
-  INSTALL_DIR: ${{ env.GITHUB_WORKSPACE }}/install
   DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
 
 jobs:
@@ -21,6 +20,13 @@ jobs:
 
       - name: Enable Developer Command Prompt (Windows)
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Create install destination
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          mkdir -p install
+          echo ::set-env name=INSTALL_DIR::$GITHUB_WORKSPACE/install
 
       - name: Build zlib
         shell: bash
