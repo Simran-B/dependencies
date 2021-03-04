@@ -6,7 +6,8 @@ on:
       - master
 
 jobs:
-  windows:
+  build:
+
     name: Windows
     runs-on: windows-latest
     steps:
@@ -15,5 +16,5 @@ jobs:
 
       - name: Build OpenColorIO
         shell: bash
-        working-directory: ${{ runner.workspace }}/build
+        working-directory: ${{ runner.workspace }}
         run: ./opencolorio.sh
