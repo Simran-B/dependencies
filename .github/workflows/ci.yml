@@ -26,7 +26,8 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           mkdir -p install
-          echo ::set-env name=INSTALL_DIR::$GITHUB_WORKSPACE/install
+          echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
 
       - name: Build zlib
         shell: bash
