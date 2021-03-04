@@ -17,6 +17,19 @@ jobs:
       - name: Enable Developer Command Prompt (Windows)
         uses: ilammy/msvc-dev-cmd@v1
 
+      - name: Build OpenEXR
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/AcademySoftwareFoundation/openexr.git
+          cd openexr
+          git checkout v2.5.5
+          mkdir build
+          cd build
+          PATH=$GITHUB_WORKSPACE/install:$PATH cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          ninja
+          ninja install
+
       - name: Build OpenColorIO
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -26,5 +39,19 @@ jobs:
           git checkout v2.0.0
           mkdir build
           cd build
-          cmake .. -G Ninja -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          PATH=$GITHUB_WORKSPACE/install:$PATH cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
           ninja
+          ninja install
+
+      - name: Build OpenImageIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/OpenImageIO/oiio.git
+          cd oiio
+          git checkout v2.2.12.0
+          mkdir build
+          cd build
+          PATH=$GITHUB_WORKSPACE/install:$PATH cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/install -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          ninja
+          ninja install
