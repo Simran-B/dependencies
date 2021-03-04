@@ -71,12 +71,53 @@ jobs:
 
       - name: Build Boost
         shell: bash
+        working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
           $EXTRACT_TOOL boost_1_75_0.7z
           cd boost_1_75_0
           ./bootstrap.sh
           ./b2 install --prefix=$INSTALL_DIR
+
+      - name: Build libpng
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libpng/libpng16/1.6.37/lpng1637.zip
+          $EXTRACT_TOOL lpng1637.zip
+          cd lpng1637
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
+
+      - name: Build libtiff
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL http://download.osgeo.org/libtiff/tiff-4.2.0.zip
+          $EXTRACT_TOOL tiff-4.2.0.zip
+          cd tiff-4.2.0
+          mkdir b
+          cd b
+          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
+
+      - name: Build libjpeg-turbo
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.6/libjpeg-turbo-2.0.6.tar.gz
+          $EXTRACT_TOOL libjpeg-turbo-2.0.6.tar.gz
+          $EXTRACT_TOOL libjpeg-turbo-2.0.6.tar
+          cd libjpeg-turbo-2.0.6
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build LibRaw
         shell: bash
