@@ -119,17 +119,17 @@ jobs:
           ninja
           ninja install
 
-      - name: Build LibRaw
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone https://github.com/LibRaw/LibRaw.git
-          cd LibRaw
-          git checkout 0.20.0
-          autoreconf --install
-          ./configure --prefix=$INSTALL_DIR
-          make
-          make install
+      #- name: Build LibRaw
+      #  shell: bash
+      #  working-directory: ${{ runner.workspace }}
+      #  run: |
+      #    git clone https://github.com/LibRaw/LibRaw.git
+      #    cd LibRaw
+      #    git checkout 0.20.0
+      #    autoreconf --install
+      #    ./configure --prefix=$INSTALL_DIR
+      #    make
+      #    make install
 
       - name: Build OpenImageIO
         shell: bash
