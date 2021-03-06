@@ -149,3 +149,9 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           7z a win32.7z install/*
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Windows
+          path: win32.7z
