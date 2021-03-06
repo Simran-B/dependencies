@@ -29,6 +29,7 @@ jobs:
           mkdir -p install
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
+          cmake --version
 
       - name: Build zlib
         shell: bash
@@ -73,9 +74,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
-          $EXTRACT_TOOL boost_1_75_0.7z
-          cd boost_1_75_0
+          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.7z
+          $EXTRACT_TOOL boost_1_72_0.7z
+          cd boost_1_72_0
           ./bootstrap.sh
           ./b2 install --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
 
@@ -131,18 +132,18 @@ jobs:
       #    make
       #    make install
 
-      #- name: Build OpenImageIO
-      #  shell: bash
-      #  working-directory: ${{ runner.workspace }}
-      #  run: |
-      #    git clone https://github.com/OpenImageIO/oiio.git
-      #    cd oiio
-      #    git checkout v2.2.12.0
-      #    mkdir build
-      #    cd build
-      #    cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-      #    ninja
-      #    ninja install
+      - name: Build OpenImageIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/OpenImageIO/oiio.git
+          cd oiio
+          git checkout v2.2.12.0
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Package
         shell: bash
