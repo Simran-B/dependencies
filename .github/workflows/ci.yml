@@ -29,7 +29,6 @@ jobs:
           mkdir -p install
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
-          cmake --version
 
       - name: Build zlib
         shell: bash
@@ -74,11 +73,11 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.7z
-          $EXTRACT_TOOL boost_1_72_0.7z
-          cd boost_1_72_0
+          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
+          $EXTRACT_TOOL boost_1_75_0.7z
+          cd boost_1_75_0
           ./bootstrap.sh
-          ./b2 install --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
+          ./b2 install --prefix=$INSTALL_DIR --layout=system --with-filesystem --with-system --with-thread
 
       - name: Build libpng
         shell: bash
