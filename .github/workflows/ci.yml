@@ -28,6 +28,7 @@ jobs:
         run: |
           mkdir -p install
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
+          echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
 
       - name: Build zlib
