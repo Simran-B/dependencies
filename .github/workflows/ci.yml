@@ -152,6 +152,7 @@ jobs:
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
+        working-directory: ${{ runner.workspace }}
         with:
           name: Windows
           path: win32.7z
