@@ -148,7 +148,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          7z a win32.7z install/*
+          7z a win32.7z "$INSTALL_DIR/*"
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
