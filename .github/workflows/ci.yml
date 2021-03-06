@@ -52,7 +52,9 @@ jobs:
           $EXTRACT_TOOL bzip2-1.0.8.tar.gz
           $EXTRACT_TOOL bzip2-1.0.8.tar
           cd bzip2-1.0.8
-          make -i install PREFIX=$INSTALL_DIR
+          nmake -f makefile.msc
+          cp libbz2.lib "$INSTALL_DIR/lib"
+          cp bzlib.h "$INSTALL_DIR/include"
 
       - name: Build OpenEXR
         shell: bash
@@ -140,6 +142,8 @@ jobs:
           nmake -f Makefile.msvc
           cp "lib/libraw.lib" "$INSTALL_DIR/lib"
           cp "bin/libraw.dll" "$INSTALL_DIR/bin"
+          mkdir -p "$INSTALL_DIR/include/libraw"
+          cp "libraw/*.h" "$INSTALL_DIR/include/libraw"
 
       - name: Build OpenImageIO
         shell: bash
