@@ -143,7 +143,7 @@ jobs:
           cp "lib/libraw.lib" "$INSTALL_DIR/lib"
           cp "bin/libraw.dll" "$INSTALL_DIR/bin"
           mkdir -p "$INSTALL_DIR/include/libraw"
-          cp "libraw/*.h" "$INSTALL_DIR/include/libraw"
+          cp libraw/*.h "$INSTALL_DIR/include/libraw"
 
       - name: Build OpenImageIO
         shell: bash
