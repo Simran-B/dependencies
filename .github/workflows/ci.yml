@@ -137,9 +137,9 @@ jobs:
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-0.20.2.zip
           $EXTRACT_TOOL LibRaw-0.20.2.zip
           cd LibRaw-0.20.2
-          ./configure --prefix=$INSTALL_DIR
-          make
-          make install
+          nmake -f Makefile.msvc
+          cp "lib/libraw.lib" "$INSTALL_DIR/lib"
+          cp "bin/libraw.dll" "$INSTALL_DIR/bin"
 
       - name: Build OpenImageIO
         shell: bash
