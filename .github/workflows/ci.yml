@@ -30,6 +30,7 @@ jobs:
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
       - name: Build zlib
         shell: bash
