@@ -65,9 +65,7 @@ jobs:
           $EXTRACT_TOOL nasm-2.15.05.tar.xz
           $EXTRACT_TOOL nasm-2.15.05.tar
           cd nasm-2.15.05
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
+          nmake prefix="$INSTALL_DIR" /f Mkfiles/msvc.mak
 
       - name: Build Yasm
         shell: bash
