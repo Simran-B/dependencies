@@ -60,8 +60,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.zip
-          $EXTRACT_TOOL nasm-2.15.05.zip
+          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.xz
+          $EXTRACT_TOOL nasm-2.15.05.tar.xz
+          $EXTRACT_TOOL nasm-2.15.05.tar
           cd nasm-2.15.05
           ./configure --prefix="$INSTALL_DIR"
           make
