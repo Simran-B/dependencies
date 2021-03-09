@@ -68,18 +68,6 @@ jobs:
           make
           make install
 
-      - name: Build Yasm
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-          $EXTRACT_TOOL yasm-1.3.0.tar.gz
-          $EXTRACT_TOOL yasm-1.3.0.tar
-          cd yasm-1.3.0
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
-
       # TEMP START
       - name: Package
         shell: bash
@@ -93,6 +81,18 @@ jobs:
           name: Windows
           path: ${{ runner.workspace }}/assemblers-only.7z
       # TEMP END
+
+      - name: Build Yasm
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+          $EXTRACT_TOOL yasm-1.3.0.tar.gz
+          $EXTRACT_TOOL yasm-1.3.0.tar
+          cd yasm-1.3.0
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
 
       - name: Build libx264
         shell: bash
