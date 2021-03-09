@@ -28,8 +28,8 @@ jobs:
       BUILD_TYPE: RelWithDebInfo
       EXTRACT_TOOL: ${{ matrix.extract-tool }}
       CMAKE_TOOLCHAIN: ${{ matrix.toolchain }}
-      PLATFORM: ${{ matrix.os }}
-      BUILD_TOOL: ${{ matrix.os }}
+      PLATFORM: ${{ matrix.os-name }}
+      BUILD_TOOL: ${{ matrix.build-tool }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
