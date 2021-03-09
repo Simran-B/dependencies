@@ -11,6 +11,9 @@ env:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        os-name: Windows
     name: Windows
     runs-on: windows-latest
     env:
@@ -112,7 +115,7 @@ jobs:
           $EXTRACT_TOOL lame-3.100.tar.gz
           $EXTRACT_TOOL lame-3.100.tar
           cd lame-3.100
-          nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE=/machine:x64 dll
+          nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
           cp outlibmp3lame.dll $INSTALL_DIR/bin/libmp3lame.dll
           cp outlibmp3lame.lib $INSTALL_DIR/lib/libmp3lame.li
           cp include/lame.h $INSTALL_DIR/include
