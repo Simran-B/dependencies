@@ -30,7 +30,6 @@ jobs:
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
-          echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
       - name: Build zlib
         shell: bash
@@ -87,7 +86,7 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          ./configure --prefix="$INSTALL_DIR" --enable-shared
+          PATH=$INSTALL_DIR/bin:$PATH ./configure --prefix="$INSTALL_DIR" --enable-shared
           make
           make install
 
