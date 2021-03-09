@@ -5,19 +5,31 @@ on:
     branches:
       - master
 
-env:
-  DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
-  BUILD_TYPE: RelWithDebInfo
-
 jobs:
   build:
     strategy:
       matrix:
-        os-name: Windows
-    name: Windows
-    runs-on: windows-latest
+        build: [1]
+        include:
+          - os-name: windows
+            os: windows-latest
+            extract-tool: 7z x
+            toolchain: Ninja
+            build-tool: ninja
+          - os-name: mac
+            os: macos-latest
+            extract-tool: unzip
+            toolchain: Unix Makefiles
+            build-tool: make
+    name: ${{ matrix.os-name }}
+    runs-on: ${{ matrix.os }}
     env:
-      EXTRACT_TOOL: 7z x
+      DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
+      BUILD_TYPE: RelWithDebInfo
+      EXTRACT_TOOL: ${{ matrix.extract-tool }}
+      CMAKE_TOOLCHAIN: ${{ matrix.toolchain }}
+      PLATFORM: ${{ matrix.os }}
+      BUILD_TOOL: ${{ matrix.os }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -44,9 +56,9 @@ jobs:
           cd zlib-1.2.11
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build bzip2
         shell: bash
@@ -56,9 +68,17 @@ jobs:
           $EXTRACT_TOOL bzip2-1.0.8.tar.gz
           $EXTRACT_TOOL bzip2-1.0.8.tar
           cd bzip2-1.0.8
-          nmake -f makefile.msc
-          cp libbz2.lib "$INSTALL_DIR/lib"
-          cp bzlib.h "$INSTALL_DIR/include"
+          if [ "$PLATFORM" == "windows" ]
+          then
+            nmake -f makefile.msc
+            cp libbz2.lib "$INSTALL_DIR/lib"
+            cp bzlib.h "$INSTALL_DIR/include"
+          elif [ "$PLATFORM" == "mac" ]
+          then
+            ./configure --prefix="$INSTALL_DIR"
+            make
+            make install
+          fi
 
       - name: Build NASM
         shell: bash
@@ -70,8 +90,14 @@ jobs:
           cd nasm-2.15.05
           ./configure --prefix="$INSTALL_DIR"
           make
-          cp nasm.exe "$INSTALL_DIR/bin"
-          cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
+          if [ "$PLATFORM" == "windows" ]
+          then
+            cp nasm.exe "$INSTALL_DIR/bin"
+            cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
+          elif [ "$PLATFORM" == "mac" ]
+          then
+            make install
+          fi
 
       - name: Build Yasm
         shell: bash
@@ -103,9 +129,9 @@ jobs:
         run: |
           git clone https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
-          ninja
-          ninja install
+          cmake -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build libmp3lame
         shell: bash
@@ -115,10 +141,18 @@ jobs:
           $EXTRACT_TOOL lame-3.100.tar.gz
           $EXTRACT_TOOL lame-3.100.tar
           cd lame-3.100
-          nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
-          cp outlibmp3lame.dll $INSTALL_DIR/bin/libmp3lame.dll
-          cp outlibmp3lame.lib $INSTALL_DIR/lib/libmp3lame.li
-          cp include/lame.h $INSTALL_DIR/include
+          if [ "$PLATFORM" == "windows" ]
+          then
+            nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
+            cp outlibmp3lame.dll $INSTALL_DIR/bin/libmp3lame.dll
+            cp outlibmp3lame.lib $INSTALL_DIR/lib/libmp3lame.li
+            cp include/lame.h $INSTALL_DIR/include
+          elif [ "$PLATFORM" == "mac" ]
+          then
+            ./configure --prefix="$INSTALL_DIR" --enable-shared --enable-nasm
+            make
+            make install
+          fi
 
       - name: Build libopus
         shell: bash
@@ -129,9 +163,9 @@ jobs:
           git checkout v1.3.1
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build libvpx
         shell: bash
@@ -165,9 +199,9 @@ jobs:
           git checkout v2.5.5
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build OpenColorIO
         shell: bash
@@ -178,9 +212,9 @@ jobs:
           git checkout v2.0.0
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build Boost
         shell: bash
@@ -201,9 +235,9 @@ jobs:
           cd lpng1637
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build libtiff
         shell: bash
@@ -214,9 +248,9 @@ jobs:
           cd tiff-4.2.0
           mkdir b
           cd b
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build libjpeg-turbo
         shell: bash
@@ -228,9 +262,9 @@ jobs:
           cd libjpeg-turbo-2.0.6
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Build LibRaw
         shell: bash
@@ -239,11 +273,19 @@ jobs:
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-0.20.2.zip
           $EXTRACT_TOOL LibRaw-0.20.2.zip
           cd LibRaw-0.20.2
-          nmake -f Makefile.msvc
-          cp "lib/libraw.lib" "$INSTALL_DIR/lib"
-          cp "bin/libraw.dll" "$INSTALL_DIR/bin"
-          mkdir -p "$INSTALL_DIR/include/libraw"
-          cp libraw/*.h "$INSTALL_DIR/include/libraw"
+          if [ "$PLATFORM" == "windows" ]
+          then
+            nmake -f Makefile.msvc
+            cp "lib/libraw.lib" "$INSTALL_DIR/lib"
+            cp "bin/libraw.dll" "$INSTALL_DIR/bin"
+            mkdir -p "$INSTALL_DIR/include/libraw"
+            cp libraw/*.h "$INSTALL_DIR/include/libraw"
+          elif [ "$PLATFORM" == "mac" ]
+          then
+            ./configure --prefix="$INSTALL_DIR"
+            make
+            make install
+          fi
 
       - name: Build OpenImageIO
         shell: bash
@@ -254,9 +296,9 @@ jobs:
           git checkout v2.2.12.0
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
-          ninja
-          ninja install
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          $BUILD_TOOL
+          $BUILD_TOOL install
 
       - name: Package
         shell: bash
