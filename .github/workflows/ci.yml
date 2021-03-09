@@ -134,7 +134,7 @@ jobs:
         run: |
           git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
-          ./configure --prefix="$INSTALL_DIR" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+          ./configure --prefix="$INSTALL_DIR" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
           make
           make install
 
