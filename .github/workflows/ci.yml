@@ -30,6 +30,7 @@ jobs:
           echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
       - name: Build zlib
         shell: bash
@@ -68,20 +69,6 @@ jobs:
           make
           cp nasm.exe "$INSTALL_DIR/bin"
 
-      # TEMP START
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          7z a assemblers-only.7z "$INSTALL_DIR/*"
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows
-          path: ${{ runner.workspace }}/assemblers-only.7z
-      # TEMP END
-
       - name: Build Yasm
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -102,7 +89,7 @@ jobs:
           $INSTALL_DIR/bin/nasm.exe --version
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          PATH=$INSTALL_DIR/bin:$PATH ./configure --prefix="$INSTALL_DIR" --enable-shared
+          ./configure --prefix="$INSTALL_DIR" CC=cl CXX=cl --enable-shared
           make
           make install
 
