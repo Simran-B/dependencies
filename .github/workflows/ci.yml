@@ -68,6 +68,7 @@ jobs:
           ./configure --prefix="$INSTALL_DIR"
           make
           cp nasm.exe "$INSTALL_DIR/bin"
+          cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
 
       - name: Build Yasm
         shell: bash
@@ -103,17 +104,15 @@ jobs:
           ninja
           ninja install
 
-      - name: Build libmp3lame
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
-          $EXTRACT_TOOL lame-3.100.tar.gz
-          $EXTRACT_TOOL lame-3.100.tar
-          cd lame-3.100
-          ./configure --prefix="$INSTALL_DIR" --enable-nasm
-          make
-          make install
+      #- name: Build libmp3lame
+      #  shell: bash
+      #  working-directory: ${{ runner.workspace }}
+      #  run: |
+      #    $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
+      #    $EXTRACT_TOOL lame-3.100.tar.gz
+      #    $EXTRACT_TOOL lame-3.100.tar
+      #    cd lame-3.100
+      #    nmake -f Makefile.MSVC OFF=win64 MACHINE=/machine:X64
 
       - name: Build libopus
         shell: bash
@@ -147,7 +146,7 @@ jobs:
           $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
           $EXTRACT_TOOL ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
-          ./configure --prefix=$INSTALL_DIR --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265
+          ./configure --prefix=$INSTALL_DIR --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265
           make
           make install
 
