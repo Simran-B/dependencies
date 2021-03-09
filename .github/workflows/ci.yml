@@ -179,7 +179,7 @@ jobs:
           cd libvpx
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
           echo $INSTALL_DIR_ALL_FORWARD_SLASH
-          MSYS2_ARG_CONV_EXCL=\* ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+          MSYS_NO_PATHCONV=1 ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
           make
           make install
 
