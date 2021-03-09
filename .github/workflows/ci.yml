@@ -66,7 +66,7 @@ jobs:
           cd nasm-2.15.05
           ./configure --prefix="$INSTALL_DIR"
           make
-          make install
+          cp nasm.exe "$INSTALL_DIR/bin"
 
       # TEMP START
       - name: Package
