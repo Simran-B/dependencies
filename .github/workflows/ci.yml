@@ -16,11 +16,11 @@ jobs:
             extract-tool: 7z x
             toolchain: Ninja
             build-tool: ninja
-          - os-name: mac
-            os: macos-latest
-            extract-tool: unzip
-            toolchain: Unix Makefiles
-            build-tool: make
+          #- os-name: mac
+          #  os: macos-latest
+          #  extract-tool: unzip
+          #  toolchain: Unix Makefiles
+          #  build-tool: make
     name: ${{ matrix.os-name }}
     runs-on: ${{ matrix.os }}
     env:
