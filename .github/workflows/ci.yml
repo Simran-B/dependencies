@@ -143,7 +143,11 @@ jobs:
           cd lame-3.100
           if [ "$PLATFORM" == "windows" ]
           then
+            # HACK: Prevent using GCC link instead of MSVC link
+            mv /usr/bin/link /usr/bin/link.old
             nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
+            mv /usr/bin/link.old /usr/bin/link
+
             cp outlibmp3lame.dll $INSTALL_DIR/bin/libmp3lame.dll
             cp outlibmp3lame.lib $INSTALL_DIR/lib/libmp3lame.li
             cp include/lame.h $INSTALL_DIR/include
