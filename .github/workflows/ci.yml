@@ -85,7 +85,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           echo Testing NASM
-          $INSTALL_DIR/bin/nasm --version
+          $INSTALL_DIR/bin/nasm.exe --version
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
           PATH=$INSTALL_DIR/bin:$PATH ./configure --prefix="$INSTALL_DIR" --enable-shared
