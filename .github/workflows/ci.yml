@@ -89,7 +89,7 @@ jobs:
           $INSTALL_DIR/bin/nasm.exe --version
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          ./configure --prefix="$INSTALL_DIR" CC=cl CXX=cl --enable-shared
+          CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared
           make
           make install
 
