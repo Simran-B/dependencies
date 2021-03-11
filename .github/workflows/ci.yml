@@ -176,28 +176,17 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          export MSYS_NO_PATHCONV=1
-          export MSYS2_ARG_CONV_EXCL="*"
           git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
+          if [ "$PLATFORM" == "windows" ]
+          then
+            # Hack to force Win32 path instead of cygpath
+            sed -i 's/pwd/pwd -W/g' build/make/configure.sh
+          fi
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
           ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
-          # make
-          # make install
-
-      # BEGIN TEST
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          7z a win32.7z "libvpx"
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows
-          path: ${{ runner.workspace }}/win32.7z
-      # END TEST
+          make
+          make install
 
       - name: Build FFmpeg
         shell: bash
