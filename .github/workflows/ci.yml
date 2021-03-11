@@ -185,9 +185,8 @@ jobs:
           fi
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
           ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
-          which make
-          make
-          make install
+          "$GITHUB_WORKSPACE/make"
+          "$GITHUB_WORKSPACE/make" install
 
       # BEGIN TEST
       - name: Package
