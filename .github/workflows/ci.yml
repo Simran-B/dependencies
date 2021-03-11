@@ -150,7 +150,8 @@ jobs:
 
             cp output/libmp3lame.dll $INSTALL_DIR/bin
             cp output/libmp3lame.lib $INSTALL_DIR/lib
-            cp include/lame.h $INSTALL_DIR/include
+            mkdir -p $INSTALL_DIR/include/lame
+            cp include/lame.h $INSTALL_DIR/include/lame
           elif [ "$PLATFORM" == "mac" ]
           then
             ./configure --prefix="$INSTALL_DIR" --enable-shared --enable-nasm
