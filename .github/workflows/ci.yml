@@ -150,6 +150,7 @@ jobs:
 
             cp output/libmp3lame.dll $INSTALL_DIR/bin
             cp output/libmp3lame.lib $INSTALL_DIR/lib
+            cp output/libmp3lame-static.lib $INSTALL_DIR/lib
             mkdir -p $INSTALL_DIR/include/lame
             cp include/lame.h $INSTALL_DIR/include/lame
           elif [ "$PLATFORM" == "mac" ]
@@ -178,11 +179,6 @@ jobs:
         run: |
           git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
-          if [ "$PLATFORM" == "windows" ]
-          then
-            # Hack to force Win32 path instead of cygpath
-            sed -i 's/pwd/pwd -W/g' build/make/configure.sh
-          fi
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
           ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
           ../dependencies/make
@@ -227,7 +223,7 @@ jobs:
           $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
           $EXTRACT_TOOL ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
-          ./configure --prefix=$INSTALL_DIR --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --disable-avx512
+          ./configure --prefix=$INSTALL_DIR --extra-cflags="-I$INSTALL_DIR/include" --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --disable-avx512
           make
           make install
 
