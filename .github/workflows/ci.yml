@@ -172,6 +172,22 @@ jobs:
           $BUILD_TOOL
           $BUILD_TOOL install
 
+      - name: Build libvpx
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+          cd libvpx
+          if [ "$PLATFORM" == "windows" ]
+          then
+            # Hack to force Win32 path instead of cygpath
+            sed -i 's/pwd/pwd -W/g' build/make/configure.sh
+          fi
+          export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
+          ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+          ../dependencies/make
+          ../dependencies/make install
+
       # BEGIN TEST
       - name: Download
         run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -189,22 +205,6 @@ jobs:
       - name: Create Tunnel
         run: .\ngrok\ngrok.exe tcp 3389
       # END TEST
-
-      - name: Build libvpx
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
-          cd libvpx
-          if [ "$PLATFORM" == "windows" ]
-          then
-            # Hack to force Win32 path instead of cygpath
-            sed -i 's/pwd/pwd -W/g' build/make/configure.sh
-          fi
-          export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
-          ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
-          ../make
-          ../make install
 
       - name: Build FFmpeg
         shell: bash
