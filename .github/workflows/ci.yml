@@ -149,8 +149,8 @@ jobs:
             mv /usr/bin/link.old /usr/bin/link
 
             cp output/libmp3lame.dll $INSTALL_DIR/bin
-            cp output/libmp3lame.lib $INSTALL_DIR/lib
-            cp output/libmp3lame-static.lib $INSTALL_DIR/lib
+            cp output/libmp3lame.lib $INSTALL_DIR/lib/mp3lame.lib
+            #cp output/libmp3lame-static.lib $INSTALL_DIR/lib
             mkdir -p $INSTALL_DIR/include/lame
             cp include/lame.h $INSTALL_DIR/include/lame
           elif [ "$PLATFORM" == "mac" ]
@@ -223,7 +223,7 @@ jobs:
           $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
           $EXTRACT_TOOL ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
-          ./configure --prefix=$INSTALL_DIR --extra-cflags="-I$INSTALL_DIR/include" --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --disable-avx512
+          LIB=$LIB\;$INSTALL_DIR/lib PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig ./configure --prefix=$INSTALL_DIR --extra-cflags="-I$INSTALL_DIR/include" --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --disable-avx512
           make
           make install
 
