@@ -240,8 +240,8 @@ jobs:
               --enable-libx264 \
               --enable-libx265 \
               --disable-avx512
-          make
-          make install
+          ../dependencies/make
+          ../dependencies/make install
 
       - name: Build OpenEXR
         shell: bash
