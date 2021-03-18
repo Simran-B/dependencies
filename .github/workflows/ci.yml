@@ -122,6 +122,7 @@ jobs:
           CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared
           make
           make install
+          mv "$INSTALL_DIR/lib/libx264.dll.lib" "$INSTALL_DIR/lib/libx264.lib"
 
       - name: Build libx265
         shell: bash
@@ -132,6 +133,7 @@ jobs:
           cmake -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
           $BUILD_TOOL
           $BUILD_TOOL install
+          mv "$INSTALL_DIR/lib/libx265.lib" "$INSTALL_DIR/lib/x265.lib"
 
       - name: Build libmp3lame
         shell: bash
@@ -180,10 +182,10 @@ jobs:
           git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
-          ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+          ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --enable-static-msvcrt --as=yasm
           ../dependencies/make
           ../dependencies/make install
-
+          mv "$INSTALL_DIR/lib/x64/vpxmt.lib" "$INSTALL_DIR/lib/x64/vpx.lib"
 
       # BEGIN TEST
       - name: Package deps for ffmpeg
@@ -223,7 +225,21 @@ jobs:
           $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
           $EXTRACT_TOOL ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
-          LIB=$LIB\;$INSTALL_DIR/lib PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig ./configure --prefix=$INSTALL_DIR --extra-cflags="-I$INSTALL_DIR/include" --toolchain=msvc --enable-gpl --enable-version3 --enable-libmp3lame --enable-libopus --enable-libvpx --enable-libx264 --enable-libx265 --disable-avx512
+          PATH=/c/Strawberry/perl/bin:$PATH \
+            LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64 \
+            PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig \
+            ./configure \
+              --prefix=$INSTALL_DIR \
+              --extra-cflags="-I$INSTALL_DIR/include" \
+              --toolchain=msvc \
+              --enable-gpl \
+              --enable-version3 \
+              --enable-libmp3lame \
+              --enable-libopus \
+              --enable-libvpx \
+              --enable-libx264 \
+              --enable-libx265 \
+              --disable-avx512
           make
           make install
 
