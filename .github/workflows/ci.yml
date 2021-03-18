@@ -225,21 +225,21 @@ jobs:
           $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
           $EXTRACT_TOOL ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
-          PATH=/c/Strawberry/perl/bin:$PATH \
-            LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64 \
-            PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig \
-            ./configure \
-              --prefix=$INSTALL_DIR \
-              --extra-cflags="-I$INSTALL_DIR/include" \
-              --toolchain=msvc \
-              --enable-gpl \
-              --enable-version3 \
-              --enable-libmp3lame \
-              --enable-libopus \
-              --enable-libvpx \
-              --enable-libx264 \
-              --enable-libx265 \
-              --disable-avx512
+          export INCLUDE=$INCLUDE\;$INSTALL_DIR/include
+          export LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64
+          export PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig
+          export PATH=/c/Strawberry/perl/bin:$PATH
+          ./configure \
+            --prefix=$INSTALL_DIR \
+            --toolchain=msvc \
+            --enable-gpl \
+            --enable-version3 \
+            --enable-libmp3lame \
+            --enable-libopus \
+            --enable-libvpx \
+            --enable-libx264 \
+            --enable-libx265 \
+            --disable-avx512
           ../dependencies/make
           ../dependencies/make install
 
