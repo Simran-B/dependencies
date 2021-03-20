@@ -71,12 +71,35 @@ jobs:
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           set PATH=%cd%\depot_tools;%PATH%
+          mkdir breakpad
+          cd breakpad
+          cmd /c fetch breakpad
+          msbuild src\src\tools\windows\tools_windows.sln
+          mkdir -p "$INSTALL_DIR/breakpad/bin"
+          REM copy minidump_stackwalk.exe "$INSTALL_DIR/breakpad/bin"
+          cd ..
           mkdir crashpad
           cd crashpad
           cmd /c fetch crashpad
           cd crashpad
           cmd /c gn gen out/Default
           ninja -C out/Default
+          xcopy /i /s *.h "$INSTALL_DIR"
+          xcopy /i /s *.lib "$INSTALL_DIR"
+
+      # BEGIN TEST
+      - name: Package
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          7z a breakpad-tree.7z "breakpad"
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: Breakpad
+          path: ${{ runner.workspace }}/breakpad-tree.7z
+      # END TEST
 
       - name: Build zlib
         shell: bash
@@ -90,7 +113,10 @@ jobs:
           cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           $BUILD_TOOL
           $BUILD_TOOL install
-          touch "$INSTALL_DIR/include/unistd.h" # HACK
+          if [ "$PLATFORM" == "windows" ]
+          then
+            touch "$INSTALL_DIR/include/unistd.h" # HACK
+          fi
 
       - name: Build bzip2
         shell: bash
