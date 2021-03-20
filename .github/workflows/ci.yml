@@ -47,11 +47,6 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
-      #- name: Set up Python 2.7
-      #  uses: actions/setup-python@v2
-      #  with:
-      #    python-version: 2.7
-
       # BEGIN TEST
       #- name: Download
       #  run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -75,7 +70,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          set PATH=%cd%/depot_tools;%PATH%
+          set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
           fetch crashpad
