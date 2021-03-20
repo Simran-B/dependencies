@@ -74,18 +74,22 @@ jobs:
           mkdir breakpad
           cd breakpad
           cmd /c fetch breakpad
-          msbuild src\src\tools\windows\tools_windows.sln
-          mkdir -p "$INSTALL_DIR/breakpad/bin"
+          set PATH=%PATH%;%cd%\src\src\tools\gyp
+          cd src\src\processor
+          set GYP_MSVS_VERSION=2017
+          cmd /c gyp processor.gyp
+          msbuild processor.sln
+          REM mkdir -p "$INSTALL_DIR/breakpad/bin"
           REM copy minidump_stackwalk.exe "$INSTALL_DIR/breakpad/bin"
-          cd ..
-          mkdir crashpad
-          cd crashpad
-          cmd /c fetch crashpad
-          cd crashpad
-          cmd /c gn gen out/Default
-          ninja -C out/Default
-          xcopy /i /s *.h "$INSTALL_DIR"
-          xcopy /i /s *.lib "$INSTALL_DIR"
+          REM cd ..
+          REM mkdir crashpad
+          REM cd crashpad
+          REM cmd /c fetch crashpad
+          REM cd crashpad
+          REM cmd /c gn gen out/Default
+          REM ninja -C out/Default
+          REM xcopy /s *.h "$INSTALL_DIR"
+          REM xcopy /s *.lib "$INSTALL_DIR"
 
       # BEGIN TEST
       - name: Package
