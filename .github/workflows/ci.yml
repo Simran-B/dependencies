@@ -47,6 +47,19 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
+      - name: Build Google Crashpad
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          PATH=$PATH:$(pwd)/depot_tools
+          mkdir crashpad
+          cd crashpad
+          fetch crashpad
+          cd crashpad
+          gn gen out/Default
+          ninja -C out/Default
+
       - name: Build zlib
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -351,6 +364,18 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          $BUILD_TOOL
+          $BUILD_TOOL install
+
+      - name: Build OpenTimelineIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/PixarAnimationStudios/OpenTimelineIO.git
+          cd OpenTimelineIO
+          mkdir build
+          cd build
+          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
           $BUILD_TOOL
           $BUILD_TOOL install
 
