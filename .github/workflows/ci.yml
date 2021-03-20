@@ -57,7 +57,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          PATH=$PATH:$(pwd)/depot_tools
+          PATH=$(pwd)/depot_tools:$PATH
           mkdir crashpad
           cd crashpad
           fetch crashpad
