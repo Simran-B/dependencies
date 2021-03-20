@@ -47,6 +47,11 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
+      - name: Set up Python 2.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+
       - name: Build Google Crashpad
         shell: bash
         working-directory: ${{ runner.workspace }}
