@@ -73,9 +73,9 @@ jobs:
           set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
-          fetch crashpad
+          cmd /c fetch crashpad
           cd crashpad
-          gn gen out/Default
+          cmd /c gn gen out/Default
           ninja -C out/Default
 
       - name: Build zlib
