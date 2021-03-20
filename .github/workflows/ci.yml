@@ -78,7 +78,7 @@ jobs:
           cd src\src\processor
           set GYP_MSVS_VERSION=2017
           cmd /c gyp processor.gyp
-          msbuild processor.sln
+          msbuild processor.sln /p:Configuration=Release /p:Platform=x64
           REM mkdir -p "$INSTALL_DIR/breakpad/bin"
           REM copy minidump_stackwalk.exe "$INSTALL_DIR/breakpad/bin"
           REM cd ..
