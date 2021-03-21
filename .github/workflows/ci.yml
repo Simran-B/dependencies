@@ -74,28 +74,28 @@ jobs:
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/breakpad/bin/cygwin1.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/breakpad/bin/cygstdc++-6.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/breakpad/bin/cyggcc_s-1.dll"
-          REM mkdir crashpad
-          REM cd crashpad
-          REM cmd /c fetch crashpad
-          REM cd crashpad
-          REM cmd /c gn gen out/Default
-          REM ninja -C out/Default
-          REM xcopy /s *.h "%INSTALL_DIR%"
-          REM xcopy /s *.lib "%INSTALL_DIR%"
-          REM xcopy /s *.exe "%INSTALL_DIR%"
+          mkdir crashpad
+          cd crashpad
+          cmd /c fetch crashpad
+          cd crashpad
+          cmd /c gn gen out/Default
+          ninja -C out/Default
+          xcopy /s *.h "%INSTALL_DIR%"
+          xcopy /s *.lib "%INSTALL_DIR%"
+          xcopy /s *.exe "%INSTALL_DIR%"
 
       # BEGIN TEST
       - name: Package
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          7z a breakpad-tree.7z "breakpad"
+          7z a win32.7z "$INSTALL_DIR/*"
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: Breakpad
-          path: ${{ runner.workspace }}/breakpad-tree.7z
+          name: Windows
+          path: ${{ runner.workspace }}/win32.7z
       # END TEST
 
       - name: Build zlib
