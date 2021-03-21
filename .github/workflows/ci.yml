@@ -447,7 +447,6 @@ jobs:
           cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
           make
           make install
-          mv "$INSTALL_DIR/lib/libx265.lib" "$INSTALL_DIR/lib/x265.lib"
 
       - name: Build libmp3lame
         shell: bash
