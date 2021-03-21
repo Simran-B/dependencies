@@ -63,27 +63,6 @@ jobs:
       #  run: .\ngrok\ngrok.exe tcp 3389
       # END TEST
 
-      - name: Build Google Crashpad
-        shell: cmd
-        working-directory: ${{ runner.workspace }}
-        run: |
-          mkdir -p "%INSTALL_DIR%/breakpad/bin"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/bin/minidump_stackwalk.exe"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/bin/cygwin1.dll"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/bin/cygstdc++-6.dll"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/bin/cyggcc_s-1.dll"
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          set PATH=%cd%\depot_tools;%PATH%
-          mkdir crashpad
-          cd crashpad
-          cmd /c fetch crashpad
-          cd crashpad
-          cmd /c gn gen out/Default
-          ninja -C out/Default
-          xcopy /i /s *.h "%INSTALL_DIR%/include/crashpad"
-          xcopy /i /s *.lib "%INSTALL_DIR%/lib/crashpad"
-          xcopy /i /s *.exe "%INSTALL_DIR%/bin/crashpad"
-
       - name: Build zlib
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -348,6 +327,27 @@ jobs:
           nmake
           nmake install
 
+      - name: Build Google Crashpad
+        shell: cmd
+        working-directory: ${{ runner.workspace }}
+        run: |
+          mkdir -p "%INSTALL_DIR%/breakpad/bin"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/bin/minidump_stackwalk.exe"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/bin/cygwin1.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/bin/cygstdc++-6.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/bin/cyggcc_s-1.dll"
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          set PATH=%cd%\depot_tools;%PATH%
+          mkdir crashpad
+          cd crashpad
+          cmd /c fetch crashpad
+          cd crashpad
+          cmd /c gn gen out/Default
+          ninja -C out/Default
+          xcopy /i /s *.h "%INSTALL_DIR%/include/crashpad"
+          xcopy /i /s *.lib "%INSTALL_DIR%/lib/crashpad"
+          xcopy /i /s *.exe "%INSTALL_DIR%/bin/crashpad"
+
       - name: Package
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -392,7 +392,7 @@ jobs:
           cd zlib-$ZLIB_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
           make
           make install
 
