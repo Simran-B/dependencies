@@ -48,7 +48,7 @@ jobs:
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
       - name: Build Qt
-        shell: bash
+        shell: cmd
         working-directory: ${{ runner.workspace }}
         run: |
           git clone https://code.qt.io/qt/qt5.git
