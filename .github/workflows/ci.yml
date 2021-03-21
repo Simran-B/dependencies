@@ -383,18 +383,6 @@ jobs:
           echo "/opt/olive-editor" >> $GITHUB_PATH
           echo "/opt/olive-editor/bin" >> $GITHUB_PATH
 
-      - name: Build Qt
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone https://code.qt.io/qt/qt5.git
-          cd qt5
-          git checkout $QT_VERSION
-          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
-          make
-          make install
-
       - name: Build zlib
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -519,3 +507,15 @@ jobs:
             --disable-avx512
           ../dependencies/make
           ../dependencies/make install
+
+      - name: Build Qt
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout $QT_VERSION
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          make
+          make install
