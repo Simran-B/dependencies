@@ -47,6 +47,18 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
+      - name: Build Qt
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout 5.15.2
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
+          nmake
+          nmake install
+
       # BEGIN TEST
       #- name: Download
       #  run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -70,11 +82,11 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           mkdir -p "%INSTALL_DIR%/breakpad/bin"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/breakpad/bin/minidump_stackwalk.exe"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/breakpad/bin/cygwin1.dll"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/breakpad/bin/cygstdc++-6.dll"
-          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/breakpad/bin/cyggcc_s-1.dll"
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/bin/minidump_stackwalk.exe"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/bin/cygwin1.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/bin/cygstdc++-6.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/bin/cyggcc_s-1.dll"
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
           set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
@@ -82,22 +94,22 @@ jobs:
           cd crashpad
           cmd /c gn gen out/Default
           ninja -C out/Default
-          xcopy /s *.h "%INSTALL_DIR%"
-          xcopy /s *.lib "%INSTALL_DIR%"
-          xcopy /s *.exe "%INSTALL_DIR%"
+          xcopy /i /s *.h "%INSTALL_DIR%/include/crashpad"
+          xcopy /i /s *.lib "%INSTALL_DIR%/lib/crashpad"
+          xcopy /i /s *.exe "%INSTALL_DIR%/bin/crashpad"
 
       # BEGIN TEST
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          7z a win32.7z "$INSTALL_DIR/*"
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows
-          path: ${{ runner.workspace }}/win32.7z
+      #- name: Package
+      #  shell: bash
+      #  working-directory: ${{ runner.workspace }}
+      #  run: |
+      #    7z a win32.7z "$INSTALL_DIR/*"
+      #
+      #- name: 'Upload Artifact'
+      #  uses: actions/upload-artifact@v2
+      #  with:
+      #    name: Windows
+      #    path: ${{ runner.workspace }}/win32.7z
       # END TEST
 
       - name: Build zlib
