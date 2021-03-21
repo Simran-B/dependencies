@@ -46,6 +46,17 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
+      - name: Build OpenSSL
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout OpenSSL_1_1_1j
+          perl Configure VC-WIN64A --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
+          nmake
+          nmake install
+
       # BEGIN TEST
       #- name: Download
       #  run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -379,6 +390,17 @@ jobs:
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
           echo "/opt/olive-editor" >> $GITHUB_PATH
           echo "/opt/olive-editor/bin" >> $GITHUB_PATH
+
+      - name: Build OpenSSL
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout OpenSSL_1_1_1j
+          perl Configure darwin64-x86_64-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
+          make depend
+          make install
 
       - name: Build zlib
         shell: bash
