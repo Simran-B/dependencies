@@ -46,17 +46,6 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
-      - name: Build OpenSSL
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone https://github.com/openssl/openssl.git
-          cd openssl
-          git checkout OpenSSL_1_1_1j
-          perl Configure VC-WIN64A --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
-          nmake
-          nmake install
-
       # BEGIN TEST
       #- name: Download
       #  run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -122,6 +111,17 @@ jobs:
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
+
+      - name: Build OpenSSL
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout OpenSSL_1_1_1j
+          perl Configure VC-WIN64A --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
+          nmake
+          nmake install
 
       - name: Build libx264
         shell: bash
