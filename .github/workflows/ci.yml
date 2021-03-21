@@ -45,18 +45,6 @@ jobs:
           echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
           echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
-      - name: Build Qt
-        shell: cmd
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone https://code.qt.io/qt/qt5.git
-          cd qt5
-          git checkout %QT_VERSION%
-          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
-          nmake
-          nmake install
-
       # BEGIN TEST
       #- name: Download
       #  run: Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
@@ -347,6 +335,18 @@ jobs:
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
           ninja
           ninja install
+
+      - name: Build Qt
+        shell: cmd
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout %QT_VERSION%
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
+          nmake
+          nmake install
 
       - name: Package
         shell: bash
