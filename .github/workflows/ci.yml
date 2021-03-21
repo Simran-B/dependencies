@@ -398,6 +398,7 @@ jobs:
           git clone https://github.com/openssl/openssl.git
           cd openssl
           git checkout OpenSSL_1_1_1j
+          export PATH=/c/Strawberry/perl/bin:$PATH
           perl Configure darwin64-x86_64-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
           make depend
           make install
