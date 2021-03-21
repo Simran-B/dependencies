@@ -259,7 +259,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.tar.gz
-          tar xzf tiff-$TIFF_VERSION.zip
+          tar xzf tiff-$TIFF_VERSION.tar.gz
           cd tiff-$TIFF_VERSION
           mkdir b
           cd b
@@ -564,7 +564,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.tar.gz
-          tar xzf tiff-$TIFF_VERSION.zip
+          tar xzf tiff-$TIFF_VERSION.tar.gz
           cd tiff-$TIFF_VERSION
           mkdir b
           cd b
