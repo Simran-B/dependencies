@@ -55,7 +55,7 @@ jobs:
           cd qt5
           git checkout 5.15.2
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
+          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
           nmake
           nmake install
 
