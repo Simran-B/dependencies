@@ -10,12 +10,19 @@ env:
   BUILD_TYPE: RelWithDebInfo
 
   QT_VERSION: 5.15.2
+  ZLIB_VERSION: 1.2.11
   BZIP_VERSION: 1.0.8
   NASM_VERSION: 2.15.05
   YASM_VERSION: 1.3.0
-  LAME_VERSION: 3.100
+  LAME_VERSION: "3.100"
   OPUS_VERSION: v1.3.1
   FFMPEG_VERSION: 4.3.2
+  OPENEXR_VERSION: v2.5.5
+  OCIO_VERSION: v2.0.0
+  TIFF_VERSION: 4.2.0
+  JPEGTURBO_VERSION: 2.0.6
+  LIBRAW_VERSION: 0.20.2
+  OIIO_VERSION: v2.2.12.0
 
 jobs:
   windows:
@@ -93,9 +100,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://zlib.net/zlib1211.zip
-          7z x zlib1211.zip
-          cd zlib-1.2.11
+          $DOWNLOAD_TOOL https://zlib.net/zlib-$ZLIB_VERSION.tar.xz
+          tar xf zlib-$ZLIB_VERSION.tar.xz
+          cd zlib-$ZLIB_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -236,7 +243,7 @@ jobs:
         run: |
           git clone https://github.com/AcademySoftwareFoundation/openexr.git
           cd openexr
-          git checkout v2.5.5
+          git checkout $OPENEXR_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
@@ -249,7 +256,7 @@ jobs:
         run: |
           git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
           cd OpenColorIO
-          git checkout v2.0.0
+          git checkout $OCIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
@@ -283,9 +290,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL http://download.osgeo.org/libtiff/tiff-4.2.0.zip
-          7z x tiff-4.2.0.zip
-          cd tiff-4.2.0
+          $DOWNLOAD_TOOL http://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.zip
+          7z x tiff-$TIFF_VERSION.zip
+          cd tiff-$TIFF_VERSION
           mkdir b
           cd b
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -296,9 +303,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.6/libjpeg-turbo-2.0.6.tar.gz
-          tar xzf libjpeg-turbo-2.0.6.tar.gz
-          cd libjpeg-turbo-2.0.6
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/$JPEGTURBO_VERSION/libjpeg-turbo-$JPEGTURBO_VERSION.tar.gz
+          tar xzf libjpeg-turbo-$JPEGTURBO_VERSION.tar.gz
+          cd libjpeg-turbo-$JPEGTURBO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -309,9 +316,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-0.20.2.zip
-          7z x LibRaw-0.20.2.zip
-          cd LibRaw-0.20.2
+          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.zip
+          7z x LibRaw-$LIBRAW_VERSION.zip
+          cd LibRaw-$LIBRAW_VERSION
           nmake -f Makefile.msvc
           cp "lib/libraw.lib" "$INSTALL_DIR/lib"
           cp "bin/libraw.dll" "$INSTALL_DIR/bin"
@@ -324,7 +331,7 @@ jobs:
         run: |
           git clone https://github.com/OpenImageIO/oiio.git
           cd oiio
-          git checkout v2.2.12.0
+          git checkout $OIIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
@@ -393,9 +400,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://zlib.net/zlib1211.zip
-          unzip zlib1211.zip
-          cd zlib-1.2.11
+          $DOWNLOAD_TOOL https://zlib.net/zlib-$ZLIB_VERSION.tar.xz
+          tar xf zlib-$ZLIB_VERSION.tar.xz
+          cd zlib-$ZLIB_VERSION
           mkdir build
           cd build
           cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
