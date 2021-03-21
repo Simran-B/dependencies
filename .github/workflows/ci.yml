@@ -444,14 +444,11 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          echo Testing NASM
-          $INSTALL_DIR/bin/nasm.exe --version
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
           CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared
           make
           make install
-          mv "$INSTALL_DIR/lib/libx264.dll.lib" "$INSTALL_DIR/lib/libx264.lib"
 
       - name: Build libx265
         shell: bash
