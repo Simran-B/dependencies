@@ -403,8 +403,8 @@ jobs:
           $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
           tar xzf bzip2-$BZIP_VERSION.tar.gz
           cd bzip2-$BZIP_VERSION
-          make PREFIX="$INSTALL_DIR"
-          make install
+          make
+          make install PREFIX="$INSTALL_DIR"
 
       - name: Build NASM
         shell: bash
@@ -444,9 +444,9 @@ jobs:
         run: |
           git clone https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
-          ninja
-          ninja install
+          cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          make
+          make install
           mv "$INSTALL_DIR/lib/libx265.lib" "$INSTALL_DIR/lib/x265.lib"
 
       - name: Build libmp3lame
@@ -505,8 +505,8 @@ jobs:
             --enable-libx264 \
             --enable-libx265 \
             --disable-avx512
-          ../dependencies/make
-          ../dependencies/make install
+          make
+          make install
 
       - name: Build Qt
         shell: bash
