@@ -69,27 +69,20 @@ jobs:
         shell: cmd
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          set PATH=%cd%\depot_tools;%PATH%
-          mkdir breakpad
-          cd breakpad
-          cmd /c fetch breakpad
-          set PATH=%PATH%;%cd%\src\src\tools\gyp
-          cd src\src\processor
-          set GYP_MSVS_VERSION=2017
-          cmd /c gyp processor.gyp
-          msbuild processor.sln /p:Configuration=Release /p:Platform=x64
-          REM mkdir -p "$INSTALL_DIR/breakpad/bin"
-          REM copy minidump_stackwalk.exe "$INSTALL_DIR/breakpad/bin"
-          REM cd ..
+          mkdir -p "%INSTALL_DIR%/breakpad/bin"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/breakpad/bin/minidump_stackwalk.exe"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/breakpad/bin/cygwin1.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/breakpad/bin/cygstdc++-6.dll"
+          curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/breakpad/bin/cyggcc_s-1.dll"
           REM mkdir crashpad
           REM cd crashpad
           REM cmd /c fetch crashpad
           REM cd crashpad
           REM cmd /c gn gen out/Default
           REM ninja -C out/Default
-          REM xcopy /s *.h "$INSTALL_DIR"
-          REM xcopy /s *.lib "$INSTALL_DIR"
+          REM xcopy /s *.h "%INSTALL_DIR%"
+          REM xcopy /s *.lib "%INSTALL_DIR%"
+          REM xcopy /s *.exe "%INSTALL_DIR%"
 
       # BEGIN TEST
       - name: Package
