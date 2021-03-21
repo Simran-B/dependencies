@@ -379,7 +379,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          mkdir -p install
+          sudo mkdir /opt/olive-editor
+          sudo chmod 777 /opt/olive-editor
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
           echo "/opt/olive-editor" >> $GITHUB_PATH
           echo "/opt/olive-editor/bin" >> $GITHUB_PATH
