@@ -23,6 +23,7 @@ env:
   JPEGTURBO_VERSION: 2.0.6
   LIBRAW_VERSION: 0.20.2
   OIIO_VERSION: v2.2.12.0
+  LIBPNG_VERSION: 1.6.37
 
 jobs:
   windows:
@@ -117,7 +118,7 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared
+          CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli
           make
           make install
           mv "$INSTALL_DIR/lib/libx264.dll.lib" "$INSTALL_DIR/lib/libx264.lib"
@@ -148,7 +149,6 @@ jobs:
 
           cp output/libmp3lame.dll $INSTALL_DIR/bin
           cp output/libmp3lame.lib $INSTALL_DIR/lib/mp3lame.lib
-          #cp output/libmp3lame-static.lib $INSTALL_DIR/lib
           mkdir -p $INSTALL_DIR/include/lame
           cp include/lame.h $INSTALL_DIR/include/lame
 
@@ -245,9 +245,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libpng/libpng16/1.6.37/lpng1637.zip
-          7z x lpng1637.zip
-          cd lpng1637
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libpng/libpng16/$LIBPNG_VERSION/libpng-$LIBPNG_VERSION.tar.xz
+          tar xf libpng-$LIBPNG_VERSION.tar.xz
+          cd libpng-$LIBPNG_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -258,8 +258,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL http://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.zip
-          7z x tiff-$TIFF_VERSION.zip
+          $DOWNLOAD_TOOL https://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.tar.gz
+          tar xzf tiff-$TIFF_VERSION.zip
           cd tiff-$TIFF_VERSION
           mkdir b
           cd b
@@ -284,8 +284,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.zip
-          7z x LibRaw-$LIBRAW_VERSION.zip
+          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
+          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
           cd LibRaw-$LIBRAW_VERSION
           nmake -f Makefile.msvc
           cp "lib/libraw.lib" "$INSTALL_DIR/lib"
@@ -334,7 +334,6 @@ jobs:
         shell: cmd
         working-directory: ${{ runner.workspace }}
         run: |
-          mkdir -p "%INSTALL_DIR%/breakpad/bin"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/minidump_stackwalk.exe -o "%INSTALL_DIR%/bin/minidump_stackwalk.exe"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/bin/cygwin1.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/bin/cygstdc++-6.dll"
@@ -347,21 +346,16 @@ jobs:
           cd crashpad
           cmd /c gn gen out/Default
           ninja -C out/Default
-          xcopy /i /s *.h "%INSTALL_DIR%/include/crashpad"
-          xcopy /i /s *.lib "%INSTALL_DIR%/lib/crashpad"
-          xcopy /i /s *.exe "%INSTALL_DIR%/bin/crashpad"
-
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          7z a win32.7z "$INSTALL_DIR/*"
+          mkdir "%INSTALL_DIR%/crashpad"
+          xcopy /s *.h "%INSTALL_DIR%/crashpad"
+          xcopy /s *.lib "%INSTALL_DIR%/crashpad"
+          xcopy /s *.exe "%INSTALL_DIR%/crashpad"
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: Windows
-          path: ${{ runner.workspace }}/win32.7z
+          path: $INSTALL_DIR
 
   mac:
     strategy:
@@ -437,7 +431,7 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          ./configure --prefix="$INSTALL_DIR" --enable-shared
+          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli
           make
           make install
 
@@ -516,6 +510,117 @@ jobs:
           make
           make install
 
+      - name: Build OpenEXR
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/AcademySoftwareFoundation/openexr.git
+          cd openexr
+          git checkout $OPENEXR_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          make
+          make install
+
+      - name: Build OpenColorIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+          cd OpenColorIO
+          git checkout $OCIO_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          make
+          make install
+
+      - name: Build Boost
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
+          7z x boost_1_75_0.7z
+          cd boost_1_75_0
+          ./bootstrap.sh
+          ./b2 install address-model=64 variant=release link=shared --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
+
+      - name: Build libpng
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libpng/libpng16/$LIBPNG_VERSION/libpng-$LIBPNG_VERSION.tar.xz
+          tar xf libpng-$LIBPNG_VERSION.tar.xz
+          cd libpng-$LIBPNG_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          make
+          make install
+
+      - name: Build libtiff
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://download.osgeo.org/libtiff/tiff-$TIFF_VERSION.tar.gz
+          tar xzf tiff-$TIFF_VERSION.zip
+          cd tiff-$TIFF_VERSION
+          mkdir b
+          cd b
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          make
+          make install
+
+      - name: Build libjpeg-turbo
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/$JPEGTURBO_VERSION/libjpeg-turbo-$JPEGTURBO_VERSION.tar.gz
+          tar xzf libjpeg-turbo-$JPEGTURBO_VERSION.tar.gz
+          cd libjpeg-turbo-$JPEGTURBO_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          make
+          make install
+
+      - name: Build LibRaw
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
+          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
+          cd LibRaw-$LIBRAW_VERSION
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
+
+      - name: Build OpenImageIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/OpenImageIO/oiio.git
+          cd oiio
+          git checkout $OIIO_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          make
+          make install
+
+      - name: Build OpenTimelineIO
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/PixarAnimationStudios/OpenTimelineIO.git
+          cd OpenTimelineIO
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
+          make
+          make install
+
       - name: Build Qt
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -527,3 +632,9 @@ jobs:
           ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
+
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: macOS (${{ matrix.arch }})
+          path: /opt
