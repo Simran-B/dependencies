@@ -191,6 +191,9 @@ jobs:
           ./configure \
             --prefix=$INSTALL_DIR \
             --toolchain=msvc \
+            --enable-shared \
+            --disable-static \
+            --disable-programs \
             --enable-gpl \
             --enable-version3 \
             --enable-libmp3lame \
@@ -455,7 +458,11 @@ jobs:
           $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/$LAME_VERSION/lame-$LAME_VERSION.tar.gz
           tar xzf lame-$LAME_VERSION.tar.gz
           cd lame-$LAME_VERSION
-          ./configure --enable-shared --prefix="$INSTALL_DIR"
+
+          # Patch to remove legacy undefined export
+          sed -i '' '/lame_init_old/d' include/libmp3lame.sym
+
+          ./configure --enable-shared --disable-static --prefix="$INSTALL_DIR"
           make
           make install
 
@@ -495,7 +502,9 @@ jobs:
           export PATH=/c/Strawberry/perl/bin:$PATH
           ./configure \
             --prefix=$INSTALL_DIR \
-            --toolchain=msvc \
+            --enable-shared \
+            --disable-static \
+            --disable-programs \
             --enable-gpl \
             --enable-version3 \
             --enable-libmp3lame \
