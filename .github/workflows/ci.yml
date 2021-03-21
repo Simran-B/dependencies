@@ -9,6 +9,14 @@ env:
   DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
   BUILD_TYPE: RelWithDebInfo
 
+  QT_VERSION: 5.15.2
+  BZIP_VERSION: 1.0.8
+  NASM_VERSION: 2.15.05
+  YASM_VERSION: 1.3.0
+  LAME_VERSION: 3.100
+  OPUS_VERSION: v1.3.1
+  FFMPEG_VERSION: 4.3.2
+
 jobs:
   windows:
     name: Windows
@@ -36,7 +44,7 @@ jobs:
         run: |
           git clone https://code.qt.io/qt/qt5.git
           cd qt5
-          git checkout 5.15.2
+          git checkout %QT_VERSION%
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
           nmake
@@ -99,10 +107,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
-          7z x bzip2-1.0.8.tar.gz
-          7z x bzip2-1.0.8.tar
-          cd bzip2-1.0.8
+          $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
+          tar xzf bzip2-$BZIP_VERSION.tar.gz
+          cd bzip2-$BZIP_VERSION
           nmake -f makefile.msc
           cp libbz2.lib "$INSTALL_DIR/lib"
           cp bzlib.h "$INSTALL_DIR/include"
@@ -111,10 +118,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.xz
-          7z x nasm-2.15.05.tar.xz
-          7z x nasm-2.15.05.tar
-          cd nasm-2.15.05
+          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
+          tar xf nasm-$NASM_VERSION.tar.xz
+          cd nasm-$NASM_VERSION
           ./configure --prefix="$INSTALL_DIR"
           make
           cp nasm.exe "$INSTALL_DIR/bin"
@@ -124,10 +130,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-          7z x yasm-1.3.0.tar.gz
-          7z x yasm-1.3.0.tar
-          cd yasm-1.3.0
+          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-$YASM_VERSION.tar.gz
+          tar xzf yasm-$YASM_VERSION.tar.gz
+          cd yasm-$YASM_VERSION
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
@@ -160,10 +165,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
-          7z x lame-3.100.tar.gz
-          7z x lame-3.100.tar
-          cd lame-3.100
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/$LAME_VERSION/lame-$LAME_VERSION.tar.gz
+          tar xzf lame-$LAME_VERSION.tar.gz
+          cd lame-$LAME_VERSION
 
           # HACK: Prevent using GCC link instead of MSVC link
           mv /usr/bin/link /usr/bin/link.old
@@ -182,7 +186,7 @@ jobs:
         run: |
           git clone https://github.com/xiph/opus.git
           cd opus
-          git checkout v1.3.1
+          git checkout $OPUS_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -205,10 +209,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.ffmpeg.org/releases/ffmpeg-4.3.2.tar.xz
-          7z x ffmpeg-4.3.2.tar.xz
-          7z x ffmpeg-4.3.2.tar
-          cd ffmpeg-4.3.2
+          $DOWNLOAD_TOOL https://www.ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.xz
+          tar xf ffmpeg-$FFMPEG_VERSION.tar.xz
+          cd ffmpeg-$FFMPEG_VERSION
           export INCLUDE=$INCLUDE\;$INSTALL_DIR/include
           export LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64
           export PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig
@@ -294,8 +297,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.6/libjpeg-turbo-2.0.6.tar.gz
-          7z x libjpeg-turbo-2.0.6.tar.gz
-          7z x libjpeg-turbo-2.0.6.tar
+          tar xzf libjpeg-turbo-2.0.6.tar.gz
           cd libjpeg-turbo-2.0.6
           mkdir build
           cd build
@@ -356,7 +358,8 @@ jobs:
   mac:
     strategy:
       matrix:
-        arch: [x86_64, arm64]
+        #arch: [x86_64, arm64]
+        arch: [x86_64]
     name: macOS (${{ matrix.arch }})
     runs-on: macos-latest
     env:
@@ -380,8 +383,136 @@ jobs:
         run: |
           git clone https://code.qt.io/qt/qt5.git
           cd qt5
-          git checkout 5.15.2
+          git checkout $QT_VERSION
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
+
+      - name: Build zlib
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://zlib.net/zlib1211.zip
+          unzip zlib1211.zip
+          cd zlib-1.2.11
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          make
+          make install
+
+      - name: Build bzip2
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
+          tar xzf bzip2-$BZIP_VERSION.tar.gz
+          cd bzip2-$BZIP_VERSION
+          make PREFIX="$INSTALL_DIR"
+          make install
+
+      - name: Build NASM
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
+          tar xf nasm-$NASM_VERSION.tar.xz
+          cd nasm-$NASM_VERSION
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
+
+      - name: Build Yasm
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-$YASM_VERSION.tar.gz
+          tar xzf yasm-$YASM_VERSION.tar.gz
+          cd yasm-$YASM_VERSION
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
+
+      - name: Build libx264
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          echo Testing NASM
+          $INSTALL_DIR/bin/nasm.exe --version
+          git clone --depth 1 https://code.videolan.org/videolan/x264.git
+          cd x264
+          CC=cl ./configure --prefix="$INSTALL_DIR" --enable-shared
+          make
+          make install
+          mv "$INSTALL_DIR/lib/libx264.dll.lib" "$INSTALL_DIR/lib/libx264.lib"
+
+      - name: Build libx265
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://bitbucket.org/multicoreware/x265_git
+          cd x265_git/build/linux
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          ninja
+          ninja install
+          mv "$INSTALL_DIR/lib/libx265.lib" "$INSTALL_DIR/lib/x265.lib"
+
+      - name: Build libmp3lame
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/$LAME_VERSION/lame-$LAME_VERSION.tar.gz
+          tar xzf lame-$LAME_VERSION.tar.gz
+          cd lame-$LAME_VERSION
+          ./configure --enable-shared --prefix="$INSTALL_DIR"
+          make
+          make install
+
+      - name: Build libopus
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://github.com/xiph/opus.git
+          cd opus
+          git checkout $OPUS_VERSION
+          mkdir build
+          cd build
+          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          make
+          make install
+
+      - name: Build libvpx
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+          cd libvpx
+          ./configure --prefix="$INSTALL_DIR" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
+          make
+          make install
+
+      - name: Build FFmpeg
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          $DOWNLOAD_TOOL https://www.ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.xz
+          tar xf ffmpeg-$FFMPEG_VERSION.tar.xz
+          cd ffmpeg-$FFMPEG_VERSION
+          export INCLUDE=$INCLUDE\;$INSTALL_DIR/include
+          export LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64
+          export PKG_CONFIG_PATH=$INSTALL_DIR/lib/pkgconfig
+          export PATH=/c/Strawberry/perl/bin:$PATH
+          ./configure \
+            --prefix=$INSTALL_DIR \
+            --toolchain=msvc \
+            --enable-gpl \
+            --enable-version3 \
+            --enable-libmp3lame \
+            --enable-libopus \
+            --enable-libvpx \
+            --enable-libx264 \
+            --enable-libx265 \
+            --disable-avx512
+          ../dependencies/make
+          ../dependencies/make install
