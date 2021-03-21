@@ -5,31 +5,14 @@ on:
     branches:
       - master
 
+env:
+  DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
+  BUILD_TYPE: RelWithDebInfo
+
 jobs:
-  build:
-    strategy:
-      matrix:
-        build: [1]
-        include:
-          - os-name: windows
-            os: windows-latest
-            extract-tool: 7z x
-            toolchain: Ninja
-            build-tool: ninja
-          #- os-name: mac
-          #  os: macos-latest
-          #  extract-tool: unzip
-          #  toolchain: Unix Makefiles
-          #  build-tool: make
-    name: ${{ matrix.os-name }}
-    runs-on: ${{ matrix.os }}
-    env:
-      DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
-      BUILD_TYPE: RelWithDebInfo
-      EXTRACT_TOOL: ${{ matrix.extract-tool }}
-      CMAKE_TOOLCHAIN: ${{ matrix.toolchain }}
-      PLATFORM: ${{ matrix.os-name }}
-      BUILD_TOOL: ${{ matrix.build-tool }}
+  windows:
+    name: Windows
+    runs-on: windows-latest
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -98,83 +81,52 @@ jobs:
           xcopy /i /s *.lib "%INSTALL_DIR%/lib/crashpad"
           xcopy /i /s *.exe "%INSTALL_DIR%/bin/crashpad"
 
-      # BEGIN TEST
-      #- name: Package
-      #  shell: bash
-      #  working-directory: ${{ runner.workspace }}
-      #  run: |
-      #    7z a win32.7z "$INSTALL_DIR/*"
-      #
-      #- name: 'Upload Artifact'
-      #  uses: actions/upload-artifact@v2
-      #  with:
-      #    name: Windows
-      #    path: ${{ runner.workspace }}/win32.7z
-      # END TEST
-
       - name: Build zlib
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://zlib.net/zlib1211.zip
-          $EXTRACT_TOOL zlib1211.zip
+          7z x zlib1211.zip
           cd zlib-1.2.11
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          $BUILD_TOOL
-          $BUILD_TOOL install
-          if [ "$PLATFORM" == "windows" ]
-          then
-            touch "$INSTALL_DIR/include/unistd.h" # HACK
-          fi
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
+          touch "$INSTALL_DIR/include/unistd.h" # HACK
 
       - name: Build bzip2
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
-          $EXTRACT_TOOL bzip2-1.0.8.tar.gz
-          $EXTRACT_TOOL bzip2-1.0.8.tar
+          7z x bzip2-1.0.8.tar.gz
+          7z x bzip2-1.0.8.tar
           cd bzip2-1.0.8
-          if [ "$PLATFORM" == "windows" ]
-          then
-            nmake -f makefile.msc
-            cp libbz2.lib "$INSTALL_DIR/lib"
-            cp bzlib.h "$INSTALL_DIR/include"
-          elif [ "$PLATFORM" == "mac" ]
-          then
-            ./configure --prefix="$INSTALL_DIR"
-            make
-            make install
-          fi
+          nmake -f makefile.msc
+          cp libbz2.lib "$INSTALL_DIR/lib"
+          cp bzlib.h "$INSTALL_DIR/include"
 
       - name: Build NASM
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/nasm-2.15.05.tar.xz
-          $EXTRACT_TOOL nasm-2.15.05.tar.xz
-          $EXTRACT_TOOL nasm-2.15.05.tar
+          7z x nasm-2.15.05.tar.xz
+          7z x nasm-2.15.05.tar
           cd nasm-2.15.05
           ./configure --prefix="$INSTALL_DIR"
           make
-          if [ "$PLATFORM" == "windows" ]
-          then
-            cp nasm.exe "$INSTALL_DIR/bin"
-            cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
-          elif [ "$PLATFORM" == "mac" ]
-          then
-            make install
-          fi
+          cp nasm.exe "$INSTALL_DIR/bin"
+          cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
 
       - name: Build Yasm
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
-          $EXTRACT_TOOL yasm-1.3.0.tar.gz
-          $EXTRACT_TOOL yasm-1.3.0.tar
+          7z x yasm-1.3.0.tar.gz
+          7z x yasm-1.3.0.tar
           cd yasm-1.3.0
           ./configure --prefix="$INSTALL_DIR"
           make
@@ -199,9 +151,9 @@ jobs:
         run: |
           git clone https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          ninja
+          ninja install
           mv "$INSTALL_DIR/lib/libx265.lib" "$INSTALL_DIR/lib/x265.lib"
 
       - name: Build libmp3lame
@@ -209,27 +161,20 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/lame/lame/3.100/lame-3.100.tar.gz
-          $EXTRACT_TOOL lame-3.100.tar.gz
-          $EXTRACT_TOOL lame-3.100.tar
+          7z x lame-3.100.tar.gz
+          7z x lame-3.100.tar
           cd lame-3.100
-          if [ "$PLATFORM" == "windows" ]
-          then
-            # HACK: Prevent using GCC link instead of MSVC link
-            mv /usr/bin/link /usr/bin/link.old
-            nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
-            mv /usr/bin/link.old /usr/bin/link
 
-            cp output/libmp3lame.dll $INSTALL_DIR/bin
-            cp output/libmp3lame.lib $INSTALL_DIR/lib/mp3lame.lib
-            #cp output/libmp3lame-static.lib $INSTALL_DIR/lib
-            mkdir -p $INSTALL_DIR/include/lame
-            cp include/lame.h $INSTALL_DIR/include/lame
-          elif [ "$PLATFORM" == "mac" ]
-          then
-            ./configure --prefix="$INSTALL_DIR" --enable-shared --enable-nasm
-            make
-            make install
-          fi
+          # HACK: Prevent using GCC link instead of MSVC link
+          mv /usr/bin/link /usr/bin/link.old
+          nmake -f Makefile.MSVC MSVCVER=Win64 OFF=win64 MACHINE= dll
+          mv /usr/bin/link.old /usr/bin/link
+
+          cp output/libmp3lame.dll $INSTALL_DIR/bin
+          cp output/libmp3lame.lib $INSTALL_DIR/lib/mp3lame.lib
+          #cp output/libmp3lame-static.lib $INSTALL_DIR/lib
+          mkdir -p $INSTALL_DIR/include/lame
+          cp include/lame.h $INSTALL_DIR/include/lame
 
       - name: Build libopus
         shell: bash
@@ -240,9 +185,9 @@ jobs:
           git checkout v1.3.1
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libvpx
         shell: bash
@@ -261,8 +206,8 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://www.ffmpeg.org/releases/ffmpeg-4.3.2.tar.xz
-          $EXTRACT_TOOL ffmpeg-4.3.2.tar.xz
-          $EXTRACT_TOOL ffmpeg-4.3.2.tar
+          7z x ffmpeg-4.3.2.tar.xz
+          7z x ffmpeg-4.3.2.tar
           cd ffmpeg-4.3.2
           export INCLUDE=$INCLUDE\;$INSTALL_DIR/include
           export LIB=$LIB\;$INSTALL_DIR/lib\;$INSTALL_DIR/lib/x64
@@ -291,9 +236,9 @@ jobs:
           git checkout v2.5.5
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          ninja
+          ninja install
 
       - name: Build OpenColorIO
         shell: bash
@@ -304,16 +249,16 @@ jobs:
           git checkout v2.0.0
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          ninja
+          ninja install
 
       - name: Build Boost
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
-          $EXTRACT_TOOL boost_1_75_0.7z
+          7z x boost_1_75_0.7z
           cd boost_1_75_0
           ./bootstrap.sh
           ./b2 install toolset=msvc address-model=64 variant=release link=shared --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
@@ -323,61 +268,53 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libpng/libpng16/1.6.37/lpng1637.zip
-          $EXTRACT_TOOL lpng1637.zip
+          7z x lpng1637.zip
           cd lpng1637
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libtiff
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL http://download.osgeo.org/libtiff/tiff-4.2.0.zip
-          $EXTRACT_TOOL tiff-4.2.0.zip
+          7z x tiff-4.2.0.zip
           cd tiff-4.2.0
           mkdir b
           cd b
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libjpeg-turbo
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://downloads.sourceforge.net/project/libjpeg-turbo/2.0.6/libjpeg-turbo-2.0.6.tar.gz
-          $EXTRACT_TOOL libjpeg-turbo-2.0.6.tar.gz
-          $EXTRACT_TOOL libjpeg-turbo-2.0.6.tar
+          7z x libjpeg-turbo-2.0.6.tar.gz
+          7z x libjpeg-turbo-2.0.6.tar
           cd libjpeg-turbo-2.0.6
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build LibRaw
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-0.20.2.zip
-          $EXTRACT_TOOL LibRaw-0.20.2.zip
+          7z x LibRaw-0.20.2.zip
           cd LibRaw-0.20.2
-          if [ "$PLATFORM" == "windows" ]
-          then
-            nmake -f Makefile.msvc
-            cp "lib/libraw.lib" "$INSTALL_DIR/lib"
-            cp "bin/libraw.dll" "$INSTALL_DIR/bin"
-            mkdir -p "$INSTALL_DIR/include/libraw"
-            cp libraw/*.h "$INSTALL_DIR/include/libraw"
-          elif [ "$PLATFORM" == "mac" ]
-          then
-            ./configure --prefix="$INSTALL_DIR"
-            make
-            make install
-          fi
+          nmake -f Makefile.msvc
+          cp "lib/libraw.lib" "$INSTALL_DIR/lib"
+          cp "bin/libraw.dll" "$INSTALL_DIR/bin"
+          mkdir -p "$INSTALL_DIR/include/libraw"
+          cp libraw/*.h "$INSTALL_DIR/include/libraw"
 
       - name: Build OpenImageIO
         shell: bash
@@ -388,9 +325,9 @@ jobs:
           git checkout v2.2.12.0
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          ninja
+          ninja install
 
       - name: Build OpenTimelineIO
         shell: bash
@@ -400,9 +337,9 @@ jobs:
           cd OpenTimelineIO
           mkdir build
           cd build
-          cmake .. -G "$CMAKE_TOOLCHAIN" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
-          $BUILD_TOOL
-          $BUILD_TOOL install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
+          ninja
+          ninja install
 
       - name: Package
         shell: bash
@@ -415,3 +352,36 @@ jobs:
         with:
           name: Windows
           path: ${{ runner.workspace }}/win32.7z
+
+  mac:
+    strategy:
+      matrix:
+        arch: [x86_64, arm64]
+    name: macOS (${{ matrix.arch }})
+    runs-on: macos-latest
+    env:
+      ARCH: ${{ matrix.arch }}
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
+
+      - name: Create install destination
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          mkdir -p install
+          echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
+          echo "/opt/olive-editor" >> $GITHUB_PATH
+          echo "/opt/olive-editor/bin" >> $GITHUB_PATH
+
+      - name: Build Qt
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout 5.15.2
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          make
+          make install
