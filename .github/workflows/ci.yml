@@ -402,39 +402,39 @@ jobs:
           make depend
           make install
 
-      - name: Build zlib
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://zlib.net/zlib-$ZLIB_VERSION.tar.xz
-          tar xf zlib-$ZLIB_VERSION.tar.xz
-          cd zlib-$ZLIB_VERSION
-          mkdir build
-          cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
-          make
-          make install
+      # - name: Build zlib
+      #   shell: bash
+      #   working-directory: ${{ runner.workspace }}
+      #   run: |
+      #     $DOWNLOAD_TOOL https://zlib.net/zlib-$ZLIB_VERSION.tar.xz
+      #     tar xf zlib-$ZLIB_VERSION.tar.xz
+      #     cd zlib-$ZLIB_VERSION
+      #     mkdir build
+      #     cd build
+      #     cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
+      #     make
+      #     make install
 
-      - name: Build bzip2
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
-          tar xzf bzip2-$BZIP_VERSION.tar.gz
-          cd bzip2-$BZIP_VERSION
-          make
-          make install PREFIX="$INSTALL_DIR"
+      # - name: Build bzip2
+      #   shell: bash
+      #   working-directory: ${{ runner.workspace }}
+      #   run: |
+      #     $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
+      #     tar xzf bzip2-$BZIP_VERSION.tar.gz
+      #     cd bzip2-$BZIP_VERSION
+      #     make
+      #     make install PREFIX="$INSTALL_DIR"
 
-      - name: Build NASM
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
-          tar xf nasm-$NASM_VERSION.tar.xz
-          cd nasm-$NASM_VERSION
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
+      # - name: Build NASM
+      #   shell: bash
+      #   working-directory: ${{ runner.workspace }}
+      #   run: |
+      #     $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
+      #     tar xf nasm-$NASM_VERSION.tar.xz
+      #     cd nasm-$NASM_VERSION
+      #     ./configure --prefix="$INSTALL_DIR"
+      #     make
+      #     make install
 
       - name: Build Yasm
         shell: bash
