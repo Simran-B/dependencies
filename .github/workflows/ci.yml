@@ -122,8 +122,11 @@ jobs:
           git checkout $OPENSSL_VERSION
           export PATH=/c/Strawberry/perl/bin:$PATH
           perl Configure VC-WIN64A --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
+          # HACK: Prevent using GCC link instead of MSVC link
+          mv /usr/bin/link /usr/bin/link.old
           nmake
           nmake install
+          mv /usr/bin/link.old /usr/bin/link
 
       - name: Build libx264
         shell: bash
