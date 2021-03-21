@@ -371,7 +371,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Windows
-          path: $INSTALL_DIR
+          path: ${{ env.INSTALL_DIR }}
 
   mac:
     strategy:
