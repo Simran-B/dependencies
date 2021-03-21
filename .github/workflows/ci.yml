@@ -74,6 +74,8 @@ jobs:
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/breakpad/bin/cygwin1.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/breakpad/bin/cygstdc++-6.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/breakpad/bin/cyggcc_s-1.dll"
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools
+          set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
           cmd /c fetch crashpad
