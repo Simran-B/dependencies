@@ -616,7 +616,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          brew install autoconf
+          brew install automake
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
           tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
           cd LibRaw-$LIBRAW_VERSION
