@@ -667,8 +667,14 @@ jobs:
           make
           make install
 
+      - name: Package
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          tar czf olive-dep-macx64.tar.gz /opt/olive-editor
+
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: macOS (${{ matrix.arch }})
-          path: /opt
+          path: olive-dep-macx64.tar.gz
