@@ -216,6 +216,7 @@ jobs:
             --enable-libvpx \
             --enable-libx264 \
             --enable-libx265 \
+            --enable-bzlib \
             --disable-avx512
           ../dependencies/make
           ../dependencies/make install
@@ -549,6 +550,7 @@ jobs:
             --enable-libvpx \
             --enable-libx264 \
             --enable-libx265 \
+            --enable-bzlib \
             --disable-avx512
           make
           make install
