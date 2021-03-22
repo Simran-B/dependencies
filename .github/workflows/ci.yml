@@ -42,11 +42,12 @@ jobs:
 
       - name: Create install destination
         shell: bash
-        working-directory: ${{ runner.workspace }}
         run: |
-          mkdir -p $INSTALL_DIR
-          echo "$INSTALL_DIR" >> $GITHUB_PATH
-          echo "$INSTALL_DIR/bin" >> $GITHUB_PATH
+          mkdir -p $GITHUB_WORKSPACE/install
+          echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
+          echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
+          echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
+          echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
 
       # BEGIN TEST
       #- name: Download
@@ -405,7 +406,6 @@ jobs:
 
       - name: Create install destination
         shell: bash
-        working-directory: ${{ runner.workspace }}
         run: |
           sudo mkdir /opt/olive-editor
           sudo chmod 777 /opt/olive-editor
