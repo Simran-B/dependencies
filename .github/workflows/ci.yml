@@ -630,16 +630,17 @@ jobs:
           make
           make install
 
-      #- name: Build LibRaw
-      #  shell: bash
-      #  working-directory: ${{ runner.workspace }}
-      #  run: |
-      #    $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
-      #    tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
-      #    cd LibRaw-$LIBRAW_VERSION
-      #    ./configure --prefix="$INSTALL_DIR"
-      #    make
-      #    make install
+      - name: Build LibRaw
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          brew install autoconf automake libtool
+          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
+          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
+          cd LibRaw-$LIBRAW_VERSION
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
 
       - name: Build OpenImageIO
         shell: bash
