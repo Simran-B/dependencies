@@ -371,7 +371,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          tar czf "olive-dep-win32.tar.gz" "$INSTALL_DIR"
+          tar czf "olive-dep-win32.tar.gz" $(cygpath "$INSTALL_DIR")
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
@@ -618,17 +618,16 @@ jobs:
           make
           make install
 
-      - name: Build LibRaw
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
-          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
-          cd LibRaw-$LIBRAW_VERSION
-          touch aclocal.m4 configure # HACK to prevent it trying to reconfigure
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
+      #- name: Build LibRaw
+      #  shell: bash
+      #  working-directory: ${{ runner.workspace }}
+      #  run: |
+      #    $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
+      #    tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
+      #    cd LibRaw-$LIBRAW_VERSION
+      #    ./configure --prefix="$INSTALL_DIR"
+      #    make
+      #    make install
 
       - name: Build OpenImageIO
         shell: bash
