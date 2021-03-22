@@ -30,9 +30,6 @@ jobs:
   windows:
     name: Windows
     runs-on: windows-latest
-    env:
-      INSTALL_DIR: ${{ runner.workspace }}/install
-      BOOST_ROOT: ${{ runner.workspace }}/install
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
