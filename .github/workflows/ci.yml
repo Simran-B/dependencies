@@ -622,10 +622,10 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          brew install automake
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
           tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
           cd LibRaw-$LIBRAW_VERSION
+          touch aclocal.m4 configure # HACK to prevent it trying to reconfigure
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
@@ -671,7 +671,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          tar czf olive-dep-macx64.tar.gz /opt/olive-editor
+          tar czf "olive-dep-macx64.tar.gz" "/opt/olive-editor"
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
