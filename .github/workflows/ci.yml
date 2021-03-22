@@ -30,6 +30,9 @@ jobs:
   windows:
     name: Windows
     runs-on: windows-latest
+    env:
+      INSTALL_DIR: ${{ runner.workspace }}/install
+      BOOST_ROOT: ${{ runner.workspace }}/install
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -41,11 +44,9 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          mkdir -p install
-          echo "INSTALL_DIR=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
-          echo "BOOST_ROOT=$GITHUB_WORKSPACE/install" >> $GITHUB_ENV
-          echo "$GITHUB_WORKSPACE/install" >> $GITHUB_PATH
-          echo "$GITHUB_WORKSPACE/install/bin" >> $GITHUB_PATH
+          mkdir -p $INSTALL_DIR
+          echo "$INSTALL_DIR" >> $GITHUB_PATH
+          echo "$INSTALL_DIR/bin" >> $GITHUB_PATH
 
       # BEGIN TEST
       #- name: Download
@@ -220,6 +221,8 @@ jobs:
             --disable-avx512
           ../dependencies/make
           ../dependencies/make install
+          cd ..
+          rm -rf ffmpeg-$FFMPEG_VERSION
 
       - name: Build OpenEXR
         shell: bash
@@ -246,6 +249,8 @@ jobs:
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
           ninja
           ninja install
+          cd ..
+          rm -rf OpenColorIO
 
       - name: Build Boost
         shell: bash
@@ -321,6 +326,8 @@ jobs:
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
           ninja
           ninja install
+          cd ..
+          rm -rf oiio
 
       - name: Build OpenTimelineIO
         shell: bash
@@ -345,6 +352,8 @@ jobs:
           cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
           nmake
           nmake install
+          cd ..
+          rm -rf qt5
 
       - name: Build Google Crashpad
         shell: cmd
@@ -366,6 +375,8 @@ jobs:
           xcopy /s *.h "%INSTALL_DIR%/crashpad"
           xcopy /s *.lib "%INSTALL_DIR%/crashpad"
           xcopy /s *.exe "%INSTALL_DIR%/crashpad"
+          cd ..
+          rm -rf crashpad
 
       - name: Package
         shell: bash
@@ -377,7 +388,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Windows
-          path: "olive-dep-win32.tar.gz"
+          path: ${{ runner.workspace }}/olive-dep-win32.tar.gz
 
   mac:
     strategy:
@@ -670,10 +681,10 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          tar czf "olive-dep-macx64.tar.gz" "/opt/olive-editor"
+          tar czf "olive-dep-mac-$ARCH.tar.gz" "/opt/olive-editor"
 
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: macOS (${{ matrix.arch }})
-          path: olive-dep-macx64.tar.gz
+          path: ${{ runner.workspace }}/olive-dep-mac-${{ matrix.arch }}.tar.gz
