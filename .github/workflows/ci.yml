@@ -251,8 +251,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
-          7z x boost_1_75_0.7z
+          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz
+          tar xzf boost_1_75_0.tar.gz
           cd boost_1_75_0
           ./bootstrap.sh
           ./b2 install toolset=msvc address-model=64 variant=release link=shared --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
@@ -367,11 +367,17 @@ jobs:
           xcopy /s *.lib "%INSTALL_DIR%/crashpad"
           xcopy /s *.exe "%INSTALL_DIR%/crashpad"
 
+      - name: Package
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          tar czf "olive-dep-win32.tar.gz" "$INSTALL_DIR"
+
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: Windows
-          path: ${{ env.INSTALL_DIR }}
+          path: "olive-dep-win32.tar.gz"
 
   mac:
     strategy:
@@ -567,8 +573,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.7z
-          7z x boost_1_75_0.7z
+          $DOWNLOAD_TOOL https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz
+          tar xzf boost_1_75_0.tar.gz
           cd boost_1_75_0
           ./bootstrap.sh
           ./b2 install address-model=64 variant=release link=shared --prefix=$INSTALL_DIR --with-filesystem --with-system --with-thread
