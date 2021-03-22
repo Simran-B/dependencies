@@ -347,7 +347,9 @@ jobs:
           cd qt5
           git checkout %QT_VERSION%
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release
+          set INCLUDE=%INCLUDE%;%INSTALL_DIR%\include
+          set LIB=%LIB%;%INSTALL_DIR%\lib
+          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release -ssl -openssl
           nmake
           nmake install
           cd ..
@@ -670,7 +672,7 @@ jobs:
           cd qt5
           git checkout $QT_VERSION
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release -ssl -openssl QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
 
