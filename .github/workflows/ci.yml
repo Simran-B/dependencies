@@ -453,22 +453,6 @@ jobs:
           make depend
           make install
 
-      - name: Build Qt
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone --branch $QT_VERSION --depth 1 https://code.qt.io/qt/qt5.git
-          cd qt5
-          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests \
-            -prefix "$INSTALL_DIR" -release -ssl -openssl \
-            -I "$INSTALL_DIR/include" -L "$INSTALL_DIR/lib" \
-            QMAKE_APPLE_DEVICE_ARCHS=$ARCH
-          make
-          make install
-          cd ..
-          rm -rf qt5
-
       - name: Build libx264
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -676,6 +660,22 @@ jobs:
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
           ninja
           ninja install
+
+      - name: Build Qt
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --branch $QT_VERSION --depth 1 https://code.qt.io/qt/qt5.git
+          cd qt5
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests \
+            -prefix "$INSTALL_DIR" -release -ssl -openssl \
+            -I "$INSTALL_DIR/include" -L "$INSTALL_DIR/lib" \
+            QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          make
+          make install
+          cd ..
+          rm -rf qt5
 
       - name: Build Google Crashpad
         shell: bash
