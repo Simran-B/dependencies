@@ -87,8 +87,8 @@ jobs:
           TRAVIS_REPO_SLUG: olive-editor/dependencies
           TRAVIS_COMMIT: ${{ github.sha }}
         run: |
-          $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
           cd $INSTALL_DIR/..
+          $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
           tar czf "olive-dep-win32.tar.gz" $(cygpath "install")
           ./upload.sh "olive-dep-win32.tar.gz"
 
