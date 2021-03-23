@@ -78,6 +78,19 @@ jobs:
           ninja install
           touch "$INSTALL_DIR/include/unistd.h" # HACK
 
+      - name: Test deployment
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRAVIS_REPO_SLUG: olive-editor/dependencies
+          TRAVIS_COMMIT: ${{ github.sha }}
+        run: |
+          $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
+          tar -C $(cygpath "$INSTALL_DIR/..") czf "olive-dep-win32.tar.gz" $(cygpath "$INSTALL_DIR")
+          ./upload.sh "olive-dep-win32.tar.gz"
+
       - name: Build bzip2
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -386,18 +399,6 @@ jobs:
           mv bin/*.lib lib/
           mv lib/*.dll bin/
 
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          tar czf "olive-dep-win32.tar.gz" $(cygpath "$INSTALL_DIR")
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: Windows
-          path: ${{ runner.workspace }}/olive-dep-win32.tar.gz
-
   mac:
     strategy:
       matrix:
@@ -430,6 +431,19 @@ jobs:
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
+
+      - name: Test deployment
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRAVIS_REPO_SLUG: olive-editor/dependencies
+          TRAVIS_COMMIT: ${{ github.sha }}
+        run: |
+          $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
+          tar czf "olive-dep-mac-$ARCH.tar.gz" "/opt/olive-editor"
+          ./upload.sh "olive-dep-mac-$ARCH.tar.gz"
 
       - name: Build OpenSSL
         shell: bash
@@ -705,15 +719,3 @@ jobs:
           find . -name '*.lib' -exec ditto '{}' "$INSTALL_DIR/crashpad" \;
           find . -type f ! -name '*.*' -exec ditto '{}' "$INSTALL_DIR/crashpad" \;
           cd ..
-
-      - name: Package
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          tar czf "olive-dep-mac-$ARCH.tar.gz" "/opt/olive-editor"
-
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v2
-        with:
-          name: macOS (${{ matrix.arch }})
-          path: ${{ runner.workspace }}/olive-dep-mac-${{ matrix.arch }}.tar.gz
