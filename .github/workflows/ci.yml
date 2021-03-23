@@ -95,7 +95,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/win64/nasm-$NASM_VERSION-win64.zip
-          7z x nasm-$NASM_VERSION.tar.xz
+          7z x nasm-$NASM_VERSION-win64.zip
           cd nasm-$NASM_VERSION
           cp nasm.exe "$INSTALL_DIR/bin"
           cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
