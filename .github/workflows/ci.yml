@@ -363,7 +363,7 @@ jobs:
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           set INCLUDE=%INCLUDE%;%INSTALL_DIR%\include
           set LIB=%LIB%;%INSTALL_DIR%\lib
-          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release -ssl -openssl
+          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -nomake docs -nomake demos -make translations -prefix "%INSTALL_DIR%" -release -ssl -openssl
           nmake
           nmake install
           cd ..
@@ -456,6 +456,20 @@ jobs:
           perl Configure darwin64-x86_64-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
           make depend
           make install
+
+      - name: Build Qt
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone https://code.qt.io/qt/qt5.git
+          cd qt5
+          git checkout $QT_VERSION
+          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -nomake docs -nomake demos -make translations -prefix "$INSTALL_DIR" -release -ssl -openssl QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          make
+          make install
+          cd ..
+          rm -rf qt5
 
       - name: Build Yasm
         shell: bash
@@ -677,18 +691,6 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
-          make
-          make install
-
-      - name: Build Qt
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          git clone https://code.qt.io/qt/qt5.git
-          cd qt5
-          git checkout $QT_VERSION
-          perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release -ssl -openssl QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
 
