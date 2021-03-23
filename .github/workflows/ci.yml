@@ -25,6 +25,7 @@ env:
   OIIO_VERSION: v2.2.12.0
   LIBPNG_VERSION: 1.6.37
   OPENSSL_VERSION: "OpenSSL_1_1_1j"
+  X265_VERSION: 3.5
 
 jobs:
   windows:
@@ -116,9 +117,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/openssl/openssl.git
+          git clone --branch $OPENSSL_VERSION --depth 1 https://github.com/openssl/openssl.git
           cd openssl
-          git checkout $OPENSSL_VERSION
           export PATH=/c/Strawberry/perl/bin:$PATH
           perl Configure VC-WIN64A --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
           # HACK: Prevent using GCC link instead of MSVC link
@@ -142,7 +142,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://bitbucket.org/multicoreware/x265_git
+          git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
           cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
           ninja
@@ -171,9 +171,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/xiph/opus.git
+          git clone --branch $OPUS_VERSION --depth 1 https://github.com/xiph/opus.git
           cd opus
-          git checkout $OPUS_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -244,9 +243,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/AcademySoftwareFoundation/openexr.git
+          git clone --branch $OPENEXR_VERSION --depth 1 https://github.com/AcademySoftwareFoundation/openexr.git
           cd openexr
-          git checkout $OPENEXR_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
@@ -257,9 +255,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+          git clone --branch $OCIO_VERSION --depth 1 https://github.com/AcademySoftwareFoundation/OpenColorIO.git
           cd OpenColorIO
-          git checkout $OCIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
@@ -334,9 +331,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/OpenImageIO/oiio.git
+          git clone --branch $OIIO_VERSION --depth 1 https://github.com/OpenImageIO/oiio.git
           cd oiio
-          git checkout $OIIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
@@ -349,7 +345,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/PixarAnimationStudios/OpenTimelineIO.git
+          git clone --depth 1 https://github.com/PixarAnimationStudios/OpenTimelineIO.git
           cd OpenTimelineIO
           mkdir build
           cd build
@@ -361,9 +357,8 @@ jobs:
         shell: cmd
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://code.qt.io/qt/qt5.git
+          git clone --branch %QT_VERSION% --depth 1 https://code.qt.io/qt/qt5.git
           cd qt5
-          git checkout %QT_VERSION%
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           set INCLUDE=%INCLUDE%;%INSTALL_DIR%\include
           set LIB=%LIB%;%INSTALL_DIR%\lib
@@ -381,7 +376,7 @@ jobs:
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygwin1.dll -o "%INSTALL_DIR%/bin/cygwin1.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cygstdc++-6.dll -o "%INSTALL_DIR%/bin/cygstdc++-6.dll"
           curl -fsSL http://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/win32/cyggcc_s-1.dll -o "%INSTALL_DIR%/bin/cyggcc_s-1.dll"
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
           set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
@@ -458,9 +453,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/openssl/openssl.git
+          git clone --branch $OPENSSL_VERSION --depth 1 https://github.com/openssl/openssl.git
           cd openssl
-          git checkout $OPENSSL_VERSION
           perl Configure darwin64-x86_64-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
           make depend
           make install
@@ -469,9 +463,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://code.qt.io/qt/qt5.git
+          git clone --branch $QT_VERSION --depth 1 https://code.qt.io/qt/qt5.git
           cd qt5
-          git checkout $QT_VERSION
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release -ssl -openssl-linked QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
@@ -493,7 +486,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://bitbucket.org/multicoreware/x265_git
+          git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
           cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
           ninja
@@ -518,9 +511,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/xiph/opus.git
+          git clone --branch $OPUS_VERSION --depth 1 https://github.com/xiph/opus.git
           cd opus
-          git checkout $OPUS_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
@@ -582,9 +574,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/AcademySoftwareFoundation/openexr.git
+          git clone --branch $OPENEXR_VERSION --depth 1 https://github.com/AcademySoftwareFoundation/openexr.git
           cd openexr
-          git checkout $OPENEXR_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
@@ -595,9 +586,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/AcademySoftwareFoundation/OpenColorIO.git
+          git clone --branch $OCIO_VERSION --depth 1 https://github.com/AcademySoftwareFoundation/OpenColorIO.git
           cd OpenColorIO
-          git checkout $OCIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
@@ -670,9 +660,8 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/OpenImageIO/oiio.git
+          git clone --branch $OIIO_VERSION --depth 1 https://github.com/OpenImageIO/oiio.git
           cd oiio
-          git checkout $OIIO_VERSION
           mkdir build
           cd build
           cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
@@ -683,7 +672,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone https://github.com/PixarAnimationStudios/OpenTimelineIO.git
+          git clone --depth 1 https://github.com/PixarAnimationStudios/OpenTimelineIO.git
           cd OpenTimelineIO
           mkdir build
           cd build
@@ -696,7 +685,7 @@ jobs:
         working-directory: ${{ runner.workspace }}
         run: |
           curl -fsSL https://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/osx/minidump_stackwalk -o "$INSTALL_DIR/bin/minidump_stackwalk"
-          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$(pwd)/depot_tools:$PATH
           mkdir crashpad
           cd crashpad
