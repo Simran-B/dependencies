@@ -90,28 +90,22 @@ jobs:
           cp libbz2.lib "$INSTALL_DIR/lib/bz2.lib"
           cp bzlib.h "$INSTALL_DIR/include"
 
-      - name: Build NASM
+      - name: Install NASM
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
-          tar xf nasm-$NASM_VERSION.tar.xz
+          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/win64/nasm-$NASM_VERSION-win64.zip
+          7z x nasm-$NASM_VERSION.tar.xz
           cd nasm-$NASM_VERSION
-          ./configure --prefix="$INSTALL_DIR"
-          make
           cp nasm.exe "$INSTALL_DIR/bin"
           cp nasm.exe "$INSTALL_DIR/bin/nasmw.exe"
 
-      - name: Build Yasm
+      - name: Install Yasm
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-$YASM_VERSION.tar.gz
-          tar xzf yasm-$YASM_VERSION.tar.gz
-          cd yasm-$YASM_VERSION
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
+          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-$YASM_VERSION-win64.exe
+          mv "yasm-$YASM_VERSION-win64.exe" "$INSTALL_DIR/bin/yasm.exe"
 
       - name: Build OpenSSL
         shell: bash
