@@ -198,6 +198,10 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/Konstanty/libmodplug.git
           cd libmodplug
+
+          # Force CMake to produce a pkg-config file which FFmpeg requires
+          sed -i '/if (NOT WIN32)/d' CMakeLists.txt
+
           mkdir build
           cd build
           cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
@@ -363,7 +367,7 @@ jobs:
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           set INCLUDE=%INCLUDE%;%INSTALL_DIR%\include
           set LIB=%LIB%;%INSTALL_DIR%\lib
-          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -nomake docs -nomake demos -make translations -prefix "%INSTALL_DIR%" -release -ssl -openssl
+          cmd /c configure.bat -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "%INSTALL_DIR%" -release -ssl -openssl
           nmake
           nmake install
           cd ..
@@ -435,16 +439,20 @@ jobs:
           echo "/opt/olive-editor" >> $GITHUB_PATH
           echo "/opt/olive-editor/bin" >> $GITHUB_PATH
 
-      - name: Build NASM
+      - name: Install Ninja
         shell: bash
-        working-directory: ${{ runner.workspace }}
         run: |
-          $DOWNLOAD_TOOL https://www.nasm.us/pub/nasm/releasebuilds/$NASM_VERSION/nasm-$NASM_VERSION.tar.xz
-          tar xf nasm-$NASM_VERSION.tar.xz
-          cd nasm-$NASM_VERSION
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
+          brew install ninja
+
+      - name: Install NASM
+        shell: bash
+        run: |
+          brew install nasm
+
+      - name: Install Yasm
+        shell: bash
+        run: |
+          brew install yasm
 
       - name: Build OpenSSL
         shell: bash
@@ -465,22 +473,11 @@ jobs:
           cd qt5
           git checkout $QT_VERSION
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -nomake docs -nomake demos -make translations -prefix "$INSTALL_DIR" -release -ssl -openssl QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release -ssl -openssl-linked QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
           cd ..
           rm -rf qt5
-
-      - name: Build Yasm
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          $DOWNLOAD_TOOL https://www.tortall.net/projects/yasm/releases/yasm-$YASM_VERSION.tar.gz
-          tar xzf yasm-$YASM_VERSION.tar.gz
-          cd yasm-$YASM_VERSION
-          ./configure --prefix="$INSTALL_DIR"
-          make
-          make install
 
       - name: Build libx264
         shell: bash
@@ -498,9 +495,9 @@ jobs:
         run: |
           git clone https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
-          make
-          make install
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          ninja
+          ninja install
 
       - name: Build libmp3lame
         shell: bash
@@ -526,9 +523,9 @@ jobs:
           git checkout $OPUS_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libvpx
         shell: bash
@@ -590,9 +587,9 @@ jobs:
           git checkout $OPENEXR_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          ninja
+          ninja install
 
       - name: Build OpenColorIO
         shell: bash
@@ -603,9 +600,9 @@ jobs:
           git checkout $OCIO_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          ninja
+          ninja install
 
       - name: Build Boost
         shell: bash
@@ -626,9 +623,9 @@ jobs:
           cd libpng-$LIBPNG_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libtiff
         shell: bash
@@ -639,9 +636,9 @@ jobs:
           cd tiff-$TIFF_VERSION
           mkdir b
           cd b
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build libjpeg-turbo
         shell: bash
@@ -652,9 +649,9 @@ jobs:
           cd libjpeg-turbo-$JPEGTURBO_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          ninja
+          ninja install
 
       - name: Build LibRaw
         shell: bash
@@ -678,9 +675,9 @@ jobs:
           git checkout $OIIO_VERSION
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          ninja
+          ninja install
 
       - name: Build OpenTimelineIO
         shell: bash
@@ -690,9 +687,9 @@ jobs:
           cd OpenTimelineIO
           mkdir build
           cd build
-          cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
-          make
-          make install
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
+          ninja
+          ninja install
 
       - name: Build Google Crashpad
         shell: bash
