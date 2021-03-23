@@ -428,9 +428,29 @@ jobs:
           $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
           tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
           cd LibRaw-$LIBRAW_VERSION
+          autoreconf -i
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
+
+      - name: Build Google Crashpad
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          curl -fsSL https://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/osx/minidump_stackwalk -o "$INSTALL_DIR/bin/minidump_stackwalk"
+          git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          export PATH=$(pwd)/depot_tools:$PATH
+          mkdir crashpad
+          cd crashpad
+          fetch crashpad
+          cd crashpad
+          gn gen out/Default
+          ninja -C out/Default
+          mkdir "$INSTALL_DIR/crashpad"
+          find . -name '*.h' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
+          find . -name '*.lib' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
+          find . -type f ! -name '*.*' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
+          cd ..
 
       - name: Build NASM
         shell: bash
