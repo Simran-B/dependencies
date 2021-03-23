@@ -460,7 +460,10 @@ jobs:
           git clone --branch $QT_VERSION --depth 1 https://code.qt.io/qt/qt5.git
           cd qt5
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
-          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests -prefix "$INSTALL_DIR" -release -ssl -openssl-linked QMAKE_APPLE_DEVICE_ARCHS=$ARCH
+          ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests \
+            -prefix "$INSTALL_DIR" -release -ssl -openssl \
+            -I "$INSTALL_DIR/include" -L "$INSTALL_DIR/lib" \
+            QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
           make install
           cd ..
