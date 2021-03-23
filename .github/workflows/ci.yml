@@ -192,6 +192,18 @@ jobs:
           ../dependencies/make install
           mv "$INSTALL_DIR/lib/x64/vpxmt.lib" "$INSTALL_DIR/lib/x64/vpx.lib"
 
+      - name: Build libmodplug
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --depth 1 https://github.com/Konstanty/libmodplug.git
+          cd libmodplug
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
+          ninja
+          ninja install
+
       - name: Build FFmpeg
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -217,6 +229,7 @@ jobs:
             --enable-libx264 \
             --enable-libx265 \
             --enable-bzlib \
+            --enable-libmodplug \
             --disable-avx512
           ../dependencies/make
           ../dependencies/make install
@@ -444,29 +457,6 @@ jobs:
           make depend
           make install
 
-      # - name: Build zlib
-      #   shell: bash
-      #   working-directory: ${{ runner.workspace }}
-      #   run: |
-      #     $DOWNLOAD_TOOL https://zlib.net/zlib-$ZLIB_VERSION.tar.xz
-      #     tar xf zlib-$ZLIB_VERSION.tar.xz
-      #     cd zlib-$ZLIB_VERSION
-      #     mkdir build
-      #     cd build
-      #     cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
-      #     make
-      #     make install
-
-      # - name: Build bzip2
-      #   shell: bash
-      #   working-directory: ${{ runner.workspace }}
-      #   run: |
-      #     $DOWNLOAD_TOOL https://sourceware.org/pub/bzip2/bzip2-$BZIP_VERSION.tar.gz
-      #     tar xzf bzip2-$BZIP_VERSION.tar.gz
-      #     cd bzip2-$BZIP_VERSION
-      #     make
-      #     make install PREFIX="$INSTALL_DIR"
-
       - name: Build Yasm
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -536,6 +526,18 @@ jobs:
           make
           make install
 
+      - name: Build libmodplug
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --depth 1 https://github.com/Konstanty/libmodplug.git
+          cd libmodplug
+          mkdir build
+          cd build
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR"
+          ninja
+          ninja install
+
       - name: Build FFmpeg
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -560,6 +562,7 @@ jobs:
             --enable-libx264 \
             --enable-libx265 \
             --enable-bzlib \
+            --enable-libmodplug \
             --disable-avx512
           make
           make install
