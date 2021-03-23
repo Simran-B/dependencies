@@ -447,9 +447,9 @@ jobs:
           gn gen out/Default
           ninja -C out/Default
           mkdir "$INSTALL_DIR/crashpad"
-          find . -name '*.h' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
-          find . -name '*.lib' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
-          find . -type f ! -name '*.*' -exec cp --parents \{\} "$INSTALL_DIR/crashpad" \;
+          find . -name '*.h' -exec ditto '{}' "$INSTALL_DIR/crashpad" \;
+          find . -name '*.lib' -exec ditto '{}' "$INSTALL_DIR/crashpad" \;
+          find . -type f ! -name '*.*' -exec ditto '{}' "$INSTALL_DIR/crashpad" \;
           cd ..
 
       - name: Build NASM
