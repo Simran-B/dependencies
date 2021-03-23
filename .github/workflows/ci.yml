@@ -370,7 +370,7 @@ jobs:
           cd crashpad
           cmd /c fetch crashpad
           cd crashpad
-          cmd /c gn gen out/Default
+          cmd /c gn gen out/Default --args="extra_cflags=\"/MD\""
           ninja -C out/Default
           mkdir "%INSTALL_DIR%/crashpad"
           xcopy /s *.h "%INSTALL_DIR%/crashpad"
@@ -378,6 +378,13 @@ jobs:
           xcopy /s *.exe "%INSTALL_DIR%/crashpad"
           cd ..
           rm -rf crashpad
+
+      - name: Correct install issues
+        shell: bash
+        run: |
+          cd $INSTALL_DIR
+          mv bin/*.lib lib/
+          mv lib/*.dll bin/
 
       - name: Package
         shell: bash
@@ -412,6 +419,18 @@ jobs:
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
           echo "/opt/olive-editor" >> $GITHUB_PATH
           echo "/opt/olive-editor/bin" >> $GITHUB_PATH
+
+      - name: Build LibRaw
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          brew install autoconf automake libtool
+          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
+          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
+          cd LibRaw-$LIBRAW_VERSION
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
 
       - name: Build NASM
         shell: bash
@@ -627,18 +646,6 @@ jobs:
           mkdir build
           cd build
           cmake .. -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          make
-          make install
-
-      - name: Build LibRaw
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          brew install autoconf automake libtool
-          $DOWNLOAD_TOOL https://www.libraw.org/data/LibRaw-$LIBRAW_VERSION.tar.gz
-          tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
-          cd LibRaw-$LIBRAW_VERSION
-          ./configure --prefix="$INSTALL_DIR"
           make
           make install
 
