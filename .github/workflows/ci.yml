@@ -409,11 +409,16 @@ jobs:
   mac:
     strategy:
       matrix:
-        arch: [x86_64, arm64]
+        arch: [x86_64]
+        #arch: [x86_64, arm64]
     name: macOS (${{ matrix.arch }})
     runs-on: macos-latest
     env:
       ARCH: ${{ matrix.arch }}
+      CFLAGS: "-mmacosx-version-min=10.13"
+      CXXFLAGS: "-mmacosx-version-min=10.13"
+      LDFLAGS: "-mmacosx-version-min=10.13"
+      MACOSX_DEPLOYMENT_TARGET: 10.13
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
