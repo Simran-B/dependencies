@@ -409,8 +409,7 @@ jobs:
   mac:
     strategy:
       matrix:
-        #arch: [x86_64, arm64]
-        arch: [x86_64]
+        arch: [x86_64, arm64]
     name: macOS (${{ matrix.arch }})
     runs-on: macos-latest
     env:
@@ -449,7 +448,7 @@ jobs:
         run: |
           git clone --branch $OPENSSL_VERSION --depth 1 https://github.com/openssl/openssl.git
           cd openssl
-          perl Configure darwin64-x86_64-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
+          perl Configure darwin64-$ARCH-cc --prefix="$INSTALL_DIR" --openssldir="$INSTALL_DIR"
           make depend
           make install
 
@@ -469,7 +468,7 @@ jobs:
         run: |
           git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_OSX_ARCHITECTURES=$ARCH ../../source
           ninja
           ninja install
 
@@ -496,7 +495,7 @@ jobs:
           cd opus
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -518,7 +517,7 @@ jobs:
           cd libmodplug
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=ON
+          cmake .. -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DBUILD_SHARED_LIBS=ON -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -559,7 +558,7 @@ jobs:
           cd openexr
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DPYILMBASE_ENABLE=OFF -DOPENEXR_VIEWERS_ENABLE=OFF -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -571,7 +570,7 @@ jobs:
           cd OpenColorIO
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOCIO_BUILD_PYTHON=OFF -DOCIO_BUILD_APPS=OFF -DOCIO_BUILD_TESTS=OFF -DOCIO_BUILD_GPU_TESTS=OFF -DOCIO_BUILD_DOCS=OFF -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -594,7 +593,7 @@ jobs:
           cd libpng-$LIBPNG_VERSION
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -607,7 +606,7 @@ jobs:
           cd tiff-$TIFF_VERSION
           mkdir b
           cd b
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -620,7 +619,7 @@ jobs:
           cd libjpeg-turbo-$JPEGTURBO_VERSION
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -645,7 +644,7 @@ jobs:
           cd oiio
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DUSE_PYTHON=OFF -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
@@ -657,7 +656,7 @@ jobs:
           cd OpenTimelineIO
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF
+          cmake .. -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DOTIO_PYTHON_INSTALL=OFF -DCMAKE_OSX_ARCHITECTURES=$ARCH
           ninja
           ninja install
 
