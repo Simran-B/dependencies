@@ -695,7 +695,7 @@ jobs:
           gn gen out/Default
           ninja -C out/Default
           mkdir "$INSTALL_DIR/crashpad"
-          rsync -ra --include "*/" --include "*.h" --include "*.lib" --exclude="*.*" . "$INSTALL_DIR/crashpad"
+          rsync -ra --include "*/" --include "*.h" --include "*.a" --exclude="*.*" . "$INSTALL_DIR/crashpad"
           cd ..
 
       - name: Deploy
