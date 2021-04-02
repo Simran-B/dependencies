@@ -409,10 +409,13 @@ jobs:
   mac:
     strategy:
       matrix:
-        #arch: [x86_64]
-        arch: [x86_64, arm64]
+        include:
+          - arch: x86_64
+            os: macos-latest
+          - arch: arm64
+            os: macos-11.0
     name: macOS (${{ matrix.arch }})
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
     env:
       ARCH: ${{ matrix.arch }}
       CFLAGS: "-mmacosx-version-min=10.13"
