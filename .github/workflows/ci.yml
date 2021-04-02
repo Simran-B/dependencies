@@ -412,8 +412,8 @@ jobs:
         include:
           - arch: x86_64
             os: macos-latest
-          - arch: arm64
-            os: macos-11.0
+          #- arch: arm64
+          #  os: macos-11.0
     name: macOS (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     env:
@@ -684,22 +684,22 @@ jobs:
           cd ..
           rm -rf qt5
 
-      - name: Build Google Crashpad
-        shell: bash
-        working-directory: ${{ runner.workspace }}
-        run: |
-          curl -fsSL https://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/osx/minidump_stackwalk -o "$INSTALL_DIR/bin/minidump_stackwalk"
-          git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
-          export PATH=$(pwd)/depot_tools:$PATH
-          mkdir crashpad
-          cd crashpad
-          fetch crashpad
-          cd crashpad
-          gn gen out/Default
-          ninja -C out/Default
-          mkdir "$INSTALL_DIR/crashpad"
-          rsync -ra --include "*/" --include "*.h" --include "*.a" --include "out/Default/obj/out/Default/gen/util/mach/*.o" --exclude "*.*" . "$INSTALL_DIR/crashpad"
-          cd ..
+      #- name: Build Google Crashpad
+      #  shell: bash
+      #  working-directory: ${{ runner.workspace }}
+      #  run: |
+      #    curl -fsSL https://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/osx/minidump_stackwalk -o "$INSTALL_DIR/bin/minidump_stackwalk"
+      #    git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+      #    export PATH=$(pwd)/depot_tools:$PATH
+      #    mkdir crashpad
+      #    cd crashpad
+      #    fetch crashpad
+      #    cd crashpad
+      #    gn gen out/Default
+      #    ninja -C out/Default
+      #    mkdir "$INSTALL_DIR/crashpad"
+      #    rsync -ra --include "*/" --include "*.h" --include "*.a" --include "out/Default/obj/out/Default/gen/util/mach/*.o" --exclude "*.*" . "$INSTALL_DIR/crashpad"
+      #    cd ..
 
       - name: Deploy
         shell: bash
