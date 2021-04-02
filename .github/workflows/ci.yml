@@ -409,8 +409,8 @@ jobs:
   mac:
     strategy:
       matrix:
-        arch: [x86_64]
-        #arch: [x86_64, arm64]
+        #arch: [x86_64]
+        arch: [x86_64, arm64]
     name: macOS (${{ matrix.arch }})
     runs-on: macos-latest
     env:
@@ -463,7 +463,7 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli
+          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin
           make
           make install
 
