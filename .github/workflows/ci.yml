@@ -437,13 +437,10 @@ jobs:
             echo "LDFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
             echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
           else
-            echo -e "/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
+            echo "CFLAGS=-I/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/include" >> $GITHUB_ENV
+            echo "CXXFLAGS=-I/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/include" >> $GITHUB_ENV
+            echo "LDFLAGS=-L/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr/lib" >> $GITHUB_ENV
           fi
-
-      - name: Setup Xcode version
-        uses: maxim-lobanov/setup-xcode@v1.2.1
-        with:
-          xcode-version: '12.4'
 
       - name: Install Ninja
         shell: bash
