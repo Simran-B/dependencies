@@ -428,6 +428,8 @@ jobs:
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
           echo -e "/opt/olive-editor\n/opt/olive-editor/lib\n/opt/olive-editor/include\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
 
+          ls /Library/Developer/CommandLineTools/SDKs
+
           if [ "$ARCH" == "x86_64" ]
           then
             echo "CFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
