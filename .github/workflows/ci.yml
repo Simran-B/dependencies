@@ -432,7 +432,7 @@ jobs:
           sudo mkdir /opt/olive-editor
           sudo chmod 777 /opt/olive-editor
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
-          echo -e "/opt/olive-editor\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
+          echo -e "/opt/olive-editor\n/opt/olive-editor/lib\n/opt/olive-editor/include\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
 
       - name: Install Ninja
         shell: bash
