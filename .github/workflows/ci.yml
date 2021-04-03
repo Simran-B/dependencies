@@ -1,9 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 env:
   DOWNLOAD_TOOL: curl -fLOSs --retry 2 --retry-delay 60
@@ -405,6 +402,7 @@ jobs:
           $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
           tar czf "olive-dep-win32.tar.gz" $(cygpath "install")
           ./upload.sh "olive-dep-win32.tar.gz"
+        if: github.ref == 'refs/heads/master'
 
   mac:
     strategy:
@@ -713,3 +711,4 @@ jobs:
           tar czf "olive-dep-mac-$ARCH.tar.gz" "/opt/olive-editor"
           chmod +x upload.sh
           ./upload.sh "olive-dep-mac-$ARCH.tar.gz"
+        if: github.ref == 'refs/heads/master'
