@@ -410,7 +410,7 @@ jobs:
         include:
           - arch: x86_64
             os: macos-latest
-          - arch: arm64
+          - arch: aarch64
             os: macos-latest
     name: macOS (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
@@ -485,7 +485,7 @@ jobs:
         run: |
           git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_OSX_ARCHITECTURES=$ARCH ../../source
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_SYSTEM_PROCESSOR=$ARCH ../../source
           ninja
           ninja install
 
