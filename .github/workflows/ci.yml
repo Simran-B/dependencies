@@ -471,7 +471,11 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin
+          if [ "$ARCH" == "arm64" ]
+          then
+            EXTRA_CFLAGS="-mfpu=neon"
+          fi
+          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin --extra-cflags="$EXTRA_CFLAGS"
           make
           make install
 
