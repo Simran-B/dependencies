@@ -440,6 +440,7 @@ jobs:
             sudo rm -rf /Library/Developer/CommandLineTools/SDKs/*
             echo "CFLAGS=-arch arm64" >> $GITHUB_ENV
             echo "CXXFLAGS=-arch arm64" >> $GITHUB_ENV
+            echo "ASFLAGS=-arch arm64" >> $GITHUB_ENV
           fi
 
       - name: Install Ninja
