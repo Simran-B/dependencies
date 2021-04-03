@@ -473,7 +473,7 @@ jobs:
           cd x264
           if [ "$ARCH" == "arm64" ]
           then
-            EXTRA_CFLAGS="-mfpu=neon"
+            EXTRA_CFLAGS="-mfpu=neon -arch arm64"
           fi
           ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin --extra-cflags="$EXTRA_CFLAGS" || cat config.log
           make
