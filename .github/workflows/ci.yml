@@ -438,6 +438,8 @@ jobs:
             echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
           else
             sudo rm -rf /Library/Developer/CommandLineTools/SDKs/*
+            echo "CFLAGS=-arch arm64" >> $GITHUB_ENV
+            echo "CXXFLAGS=-arch arm64" >> $GITHUB_ENV
           fi
 
       - name: Install Ninja
@@ -471,11 +473,7 @@ jobs:
         run: |
           git clone --depth 1 https://code.videolan.org/videolan/x264.git
           cd x264
-          if [ "$ARCH" == "arm64" ]
-          then
-            EXTRA_CFLAGS="-mfpu=neon -arch arm64"
-          fi
-          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin --extra-cflags="$EXTRA_CFLAGS" || cat config.log
+          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin
           make
           make install
 
