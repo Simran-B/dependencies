@@ -437,7 +437,7 @@ jobs:
             echo "LDFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
             echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
           else
-            echo "SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk"
+            echo -e "/Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk/usr\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
           fi
 
       - name: Setup Xcode version
