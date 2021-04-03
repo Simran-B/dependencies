@@ -488,7 +488,12 @@ jobs:
         run: |
           git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_SYSTEM_PROCESSOR=$ALTARCH ../../source
+          if [ "$ARCH" == "arm64" ]
+          then
+            cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCROSS_COMPILE_ARM=1 -DCMAKE_SYSTEM_PROCESSOR=aarch64 ../../source
+          else
+            cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" ../../source
+          fi
           ninja
           ninja install
 
