@@ -386,8 +386,8 @@ jobs:
           mkdir crashpad
           cd crashpad
           git clone --depth 1 https://github.com/olive-editor/crashpad.git
-          gclient config https://github.com/olive-editor/crashpad.git
-          gclient sync
+          cmd /c gclient config https://github.com/olive-editor/crashpad.git
+          cmd /c gclient sync
           cd crashpad
           cmd /c gn gen out/Default --args="extra_cflags=\"/MD\""
           ninja -C out/Default
@@ -737,7 +737,9 @@ jobs:
           export PATH=$(pwd)/depot_tools:$PATH
           mkdir crashpad
           cd crashpad
-          fetch crashpad
+          git clone --depth 1 https://github.com/olive-editor/crashpad.git
+          gclient config https://github.com/olive-editor/crashpad.git
+          gclient sync
           cd crashpad
           gn gen out/Default
           ninja -C out/Default
