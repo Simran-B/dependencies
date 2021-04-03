@@ -409,13 +409,16 @@ jobs:
       matrix:
         include:
           - arch: x86_64
+            altarch: x86_64
             os: macos-latest
           - arch: arm64
+            altarch: aarch64
             os: macos-latest
     name: macOS (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     env:
       ARCH: ${{ matrix.arch }}
+      ALTARCH: ${{ matrix.altarch }}
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -485,15 +488,7 @@ jobs:
         run: |
           git clone --branch $X265_VERSION --depth 1 https://bitbucket.org/multicoreware/x265_git
           cd x265_git/build/linux
-
-          if [ "$ARCH" == "arm64" ]
-          then
-            SYSPROC=aarch64
-          else
-            SYSPROC=$ARCH
-          fi
-
-          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_SYSTEM_PROCESSOR=$SYSPROC ../../source
+          cmake -G "Ninja" -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" -DCMAKE_SYSTEM_PROCESSOR=$ALTARCH ../../source
           ninja
           ninja install
 
