@@ -410,15 +410,11 @@ jobs:
           - arch: x86_64
             os: macos-latest
           - arch: arm64
-            os: macos-11.0
+            os: macos-latest
     name: macOS (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     env:
       ARCH: ${{ matrix.arch }}
-      CFLAGS: "-mmacosx-version-min=10.13"
-      CXXFLAGS: "-mmacosx-version-min=10.13"
-      LDFLAGS: "-mmacosx-version-min=10.13"
-      MACOSX_DEPLOYMENT_TARGET: 10.13
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v2
@@ -430,6 +426,19 @@ jobs:
           sudo chmod 777 /opt/olive-editor
           echo "INSTALL_DIR=/opt/olive-editor" >> $GITHUB_ENV
           echo -e "/opt/olive-editor\n/opt/olive-editor/lib\n/opt/olive-editor/include\n$(cat $GITHUB_PATH)" > $GITHUB_PATH
+
+          if [ "$ARCH" == "x86_64" ]
+          then
+            echo "CFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
+            echo "CXXFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
+            echo "LDFLAGS=-mmacosx-version-min=10.13" >> $GITHUB_ENV
+            echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+          fi
+
+      #- name: Setup Xcode version
+      #  uses: maxim-lobanov/setup-xcode@v1.2.1
+      #  with:
+      #    xcode-version:
 
       - name: Install Ninja
         shell: bash
