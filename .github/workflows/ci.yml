@@ -525,6 +525,16 @@ jobs:
           ninja
           ninja install
 
+      - name: Build libwebp
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --depth 1 https://chromium.googlesource.com/webm/libwebp
+          ./autogen.sh
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
+
       - name: Build FFmpeg
         shell: bash
         working-directory: ${{ runner.workspace }}
