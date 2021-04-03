@@ -327,9 +327,9 @@ jobs:
           git clone --branch %LIBWEBP_VERSION% --depth 1 https://chromium.googlesource.com/webm/libwebp
           cd libwebp
           nmake /f Makefile.vc CFG=release-static RTLIBCFG=static OBJDIR=output
-          copy output\release-static\x64\lib\*.lib "$INSTALL_DIR\lib"
-          mkdir "$INSTALL_DIR\include\webp"
-          copy src\webp\*.h "$INSTALL_DIR\include\webp"
+          copy output\release-static\x64\lib\*.lib "%INSTALL_DIR%\lib"
+          mkdir "%INSTALL_DIR%\include\webp"
+          copy src\webp\*.h "%INSTALL_DIR%\include\webp"
 
       - name: Build OpenImageIO
         shell: bash
@@ -670,6 +670,10 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
+          # HACK: We don't need freetype and it causes linking issues. You can't disable it in OIIO
+          #       so we just remove it.
+          brew remove freetype
+
           git clone --branch $OIIO_VERSION --depth 1 https://github.com/OpenImageIO/oiio.git
           cd oiio
           mkdir build
