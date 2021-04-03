@@ -475,7 +475,7 @@ jobs:
           then
             EXTRA_CFLAGS="-mfpu=neon"
           fi
-          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin --extra-cflags="$EXTRA_CFLAGS"
+          ./configure --prefix="$INSTALL_DIR" --enable-shared --disable-cli --host=$ARCH-darwin --extra-cflags="$EXTRA_CFLAGS" || cat config.log
           make
           make install
 
