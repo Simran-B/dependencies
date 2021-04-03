@@ -392,7 +392,7 @@ jobs:
       - name: Deploy
         shell: bash
         working-directory: ${{ runner.workspace }}
-        if: github.event_name == 'push'
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRAVIS_REPO_SLUG: olive-editor/dependencies
@@ -402,7 +402,6 @@ jobs:
           $DOWNLOAD_TOOL https://github.com/probonopd/uploadtool/raw/master/upload.sh
           tar czf "olive-dep-win32.tar.gz" $(cygpath "install")
           ./upload.sh "olive-dep-win32.tar.gz"
-        if: github.ref == 'refs/heads/master'
 
   mac:
     strategy:
@@ -701,7 +700,7 @@ jobs:
       - name: Deploy
         shell: bash
         working-directory: ${{ runner.workspace }}
-        if: github.event_name == 'push'
+        if: github.ref == 'refs/heads/master'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRAVIS_REPO_SLUG: olive-editor/dependencies
@@ -711,4 +710,3 @@ jobs:
           tar czf "olive-dep-mac-$ARCH.tar.gz" "/opt/olive-editor"
           chmod +x upload.sh
           ./upload.sh "olive-dep-mac-$ARCH.tar.gz"
-        if: github.ref == 'refs/heads/master'
