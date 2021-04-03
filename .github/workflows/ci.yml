@@ -459,6 +459,7 @@ jobs:
             echo "CFLAGS=-arch arm64" >> $GITHUB_ENV
             echo "CXXFLAGS=-arch arm64" >> $GITHUB_ENV
             echo "ASFLAGS=-arch arm64" >> $GITHUB_ENV
+            echo "ASMFLAGS=-arch arm64" >> $GITHUB_ENV
             echo "LDFLAGS=-arch arm64" >> $GITHUB_ENV
           fi
 
