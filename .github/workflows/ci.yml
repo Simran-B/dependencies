@@ -23,6 +23,8 @@ env:
   LIBPNG_VERSION: 1.6.37
   OPENSSL_VERSION: "OpenSSL_1_1_1j"
   X265_VERSION: 3.5
+  LIBWEBP_VERSION: v1.2.0
+  LIBVPX_VERSION: v1.10.0
 
 jobs:
   windows:
@@ -175,7 +177,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+          git clone --branch $LIBVPX_VERSION --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
           export INSTALL_DIR_ALL_FORWARD_SLASH="${INSTALL_DIR//\\//}"
           ./configure --prefix="$INSTALL_DIR_ALL_FORWARD_SLASH" --target=x86_64-win64-vs16 --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --enable-static-msvcrt --as=yasm
@@ -319,6 +321,17 @@ jobs:
           mkdir -p "$INSTALL_DIR/include/libraw"
           cp libraw/*.h "$INSTALL_DIR/include/libraw"
 
+      - name: Build libwebp
+        shell: cmd
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --branch %LIBWEBP_VERSION% --depth 1 https://chromium.googlesource.com/webm/libwebp
+          cd libwebp
+          nmake /f Makefile.vc CFG=release-static RTLIBCFG=static OBJDIR=output
+          copy output\release-static\x64\lib\*.lib "$INSTALL_DIR\lib"
+          mkdir "$INSTALL_DIR\include\webp"
+          copy src\webp\*.h "$INSTALL_DIR\include\webp"
+
       - name: Build OpenImageIO
         shell: bash
         working-directory: ${{ runner.workspace }}
@@ -372,7 +385,9 @@ jobs:
           set PATH=%cd%\depot_tools;%PATH%
           mkdir crashpad
           cd crashpad
-          cmd /c fetch crashpad
+          git clone --depth 1 https://github.com/olive-editor/crashpad.git
+          gclient config https://github.com/olive-editor/crashpad.git
+          gclient sync
           cd crashpad
           cmd /c gn gen out/Default --args="extra_cflags=\"/MD\""
           ninja -C out/Default
@@ -529,7 +544,7 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          git clone --depth 1 https://chromium.googlesource.com/webm/libvpx.git
+          git clone --branch $LIBVPX_VERSION --depth 1 https://chromium.googlesource.com/webm/libvpx.git
           cd libvpx
           ./configure --prefix="$INSTALL_DIR" --disable-examples --disable-unit-tests --enable-vp9-highbitdepth --as=yasm
           make
@@ -658,6 +673,17 @@ jobs:
           tar xzf LibRaw-$LIBRAW_VERSION.tar.gz
           cd LibRaw-$LIBRAW_VERSION
           autoreconf -i
+          ./configure --prefix="$INSTALL_DIR"
+          make
+          make install
+
+      - name: Build libwebp
+        shell: bash
+        working-directory: ${{ runner.workspace }}
+        run: |
+          git clone --branch $LIBWEBP_VERSION --depth 1 https://chromium.googlesource.com/webm/libwebp
+          cd libwebp
+          ./autogen.sh
           ./configure --prefix="$INSTALL_DIR"
           make
           make install
