@@ -1,0 +1,14 @@
+diff --git a/src/cmake/externalpackages.cmake b/src/cmake/externalpackages.cmake
+index 4234cb6a..e3755ee8 100644
+--- a/src/cmake/externalpackages.cmake
++++ b/src/cmake/externalpackages.cmake
+@@ -145,9 +145,6 @@ if (NOT BZIP2_FOUND)
+     set (BZIP2_LIBRARIES "")  # TODO: why does it break without this?
+ endif ()
+ 
+-checked_find_package (Freetype
+-                   DEFINITIONS  -DUSE_FREETYPE=1 )
+-
+ checked_find_package (HDF5
+                    ISDEPOF      Field3D)
+ checked_find_package (OpenColorIO
