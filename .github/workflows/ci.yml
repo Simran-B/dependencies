@@ -388,7 +388,7 @@ jobs:
           cmd /c gclient config https://github.com/olive-editor/crashpad.git
           cmd /c gclient sync
           cd crashpad
-          cmd /c gn gen out/Default --args="extra_cflags=\"/MD\""
+          cmd /c gn gen out/Default --args="extra_cflags=\"/MD\" extra_ldflags=\"shlwapi.lib\""
           ninja -C out/Default
           mkdir "%INSTALL_DIR%/crashpad"
           xcopy /s *.h "%INSTALL_DIR%/crashpad"
