@@ -720,6 +720,8 @@ jobs:
           ./configure
           make
           cp src/processor/minidump_stackwalk "$INSTALL_DIR/bin"
+          xcodebuild -project src/tools/mac/dump_syms/dump_syms.xcodeproj
+          cp src/tools/mac/dump_syms/build/Release/dump_syms "$INSTALL_DIR/bin"
           cd ..
           git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$(pwd)/depot_tools:$PATH
