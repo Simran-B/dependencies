@@ -703,7 +703,7 @@ jobs:
           cd qt5
           perl init-repository --module-subset=qtbase,qtsvg,qtmultimedia,qttools
           ./configure -opensource -confirm-license -opengl desktop -nomake examples -nomake tests \
-            -prefix "$INSTALL_DIR" -release -ssl -openssl \
+            -prefix "$INSTALL_DIR" -release -ssl -openssl-linked \
             -I "$INSTALL_DIR/include" -L "$INSTALL_DIR/lib" \
             QMAKE_APPLE_DEVICE_ARCHS=$ARCH
           make
