@@ -715,7 +715,12 @@ jobs:
         shell: bash
         working-directory: ${{ runner.workspace }}
         run: |
-          curl -fsSL https://hg.mozilla.org/build/tools/raw-file/755e58ebc9d4/breakpad/osx/minidump_stackwalk -o "$INSTALL_DIR/bin/minidump_stackwalk"
+          git clone https://chromium.googlesource.com/breakpad/breakpad
+          cd breakpad
+          ./configure
+          make
+          cp src/processor/minidump_stackwalk "$INSTALL_DIR/bin"
+          cd ..
           git clone --depth 1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
           export PATH=$(pwd)/depot_tools:$PATH
           mkdir crashpad
